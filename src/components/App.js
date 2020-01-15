@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { normalizedMapDispatchToProps } from '../helpers/dispatchers'
 import { connect } from 'react-redux'
-
+import {Search}  from './Search'
 class App extends Component {
   constructor (props) {
     super(props)
@@ -12,6 +12,8 @@ class App extends Component {
     return (
       <div>
         <h1>Welcome to My React App!!</h1>
+        <Search/>
+
       </div>
     )
   }
