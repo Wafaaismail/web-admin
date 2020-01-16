@@ -6,6 +6,7 @@ import Search from "./Search";
 class App extends Component {
   constructor(props) {
     super(props);
+    // this.props.setData("test", { name: "Amr" });
   }
 
   render() {

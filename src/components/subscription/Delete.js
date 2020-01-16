@@ -3,8 +3,8 @@ import { gun } from "./initGun";
 import resolvers from "../../../../server/db_utils/schema/resolvers";
 
 //Handling delete action
-handleDelete = (that, nodeName, nodeId) => {
-  data = { nodeId, ...props };
+const handleDelete = (that, nodeName, nodeId, handleStateChange) => {
+  const data = { nodeId, ...props };
 
   //Delete node from gun
   gun
@@ -21,7 +21,7 @@ handleDelete = (that, nodeName, nodeId) => {
   resolvers.Mutation.deleteNode({}, { nodeId });
 
   //Return delete flag to 0 again
-  that.setState({ delete: 0 });
+  handleStateChange("delete");
 };
 
 //Component that renders nothing
@@ -31,9 +31,10 @@ export default class Delete extends Component {
       handleDelete(
         this.props.that,
         this.props.nodeName,
-        this.props.state.nodeId
+        this.props.state.nodeId,
+        this.props.handleStateChange
       );
     }
-    // return <div></div>;
+    return null;
   }
 }

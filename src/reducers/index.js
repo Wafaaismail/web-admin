@@ -1,8 +1,8 @@
 import { combineReducers } from "redux";
-import { map, cloneDeep, get } from "lodash";
+import { map, omit, get } from "lodash";
 import uuid from "../helpers/uuid";
 import { gun } from "../components/subscription/initGun";
-import operations from "./operations";
+import { operations } from "./operations";
 
 // reducers names
 const reducerNames = ["station", "journey"];
