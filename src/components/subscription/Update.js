@@ -3,8 +3,8 @@ import { gun } from "./initGun";
 import resolvers from "../../../../server/db_utils/schema/resolvers";
 
 //Handling update action
-const handleUpdate = (that, nodeName, nodeId, props, handleStateChange) => {
-  const data = { nodeId, ...props };
+const handleUpdate = (that, nodeName, nodeId, props) => {
+  const data = { ...props };
 
   //Update node props in gun
   gun
@@ -13,29 +13,32 @@ const handleUpdate = (that, nodeName, nodeId, props, handleStateChange) => {
     .put(data);
 
   //Update node props in redux
-  // gun.map().on(() => {
-  that.props.update(nodeName, nodeId, data);
-  // });
+  gun.get(nodeName).map(() => {
+    that.props.update(nodeName, nodeId, data);
+  });
 
   //Update node props in graph
-  resolvers.Mutation.updateNode({}, { nodeId, nodeArgs: data });
-
-  //Return update flag to 0 again
-  handleStateChange("update");
+  // resolvers.Mutation.updateNode({}, { nodeId, nodeArgs: data });
 };
 
 //Component that renders nothing
 export default class Update extends Component {
-  render() {
-    if (this.props.state.update) {
+  //Called whenever change occurs whether in props or state
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.state.update) {
       handleUpdate(
-        this.props.that,
-        this.props.nodeName,
-        this.props.state.nodeId,
-        this.props.state.props,
-        this.props.handleStateChange
+        nextProps.that,
+        nextProps.nodeName,
+        nextProps.state.nodeId,
+        nextProps.state.props
       );
+      //Return update flag to 0 and empty props and nodeId
+      nextProps.handleStateChange("update");
     }
+  }
+
+  //Render function supposed to be pure, can't contain state-changing
+  render() {
     return null;
   }
 }

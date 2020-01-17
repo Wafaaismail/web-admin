@@ -3,9 +3,7 @@ import { gun } from "./initGun";
 import resolvers from "../../../../server/db_utils/schema/resolvers";
 
 //Handling delete action
-const handleDelete = (that, nodeName, nodeId, handleStateChange) => {
-  const data = { nodeId, ...props };
-
+const handleDelete = (that, nodeName, nodeId) => {
   //Delete node from gun
   gun
     .get(nodeName)
@@ -13,28 +11,30 @@ const handleDelete = (that, nodeName, nodeId, handleStateChange) => {
     .put(null);
 
   //Delete node from redux
-  //   gun.map().on(() => {
-  //     that.props.delete(nodeName, nodeId);
-  //   });
+  gun
+    .get(nodeName)
+    .map()
+    .on(() => {
+      that.props.erase(nodeName, nodeId);
+    });
 
   //Delete node from graph
-  resolvers.Mutation.deleteNode({}, { nodeId });
-
-  //Return delete flag to 0 again
-  handleStateChange("delete");
+  // resolvers.Mutation.deleteNode({}, { nodeId });
 };
 
 //Component that renders nothing
 export default class Delete extends Component {
-  render() {
-    if (this.props.state.delete) {
-      handleDelete(
-        this.props.that,
-        this.props.nodeName,
-        this.props.state.nodeId,
-        this.props.handleStateChange
-      );
+  //Called whenever change occurs whether in props or state
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.state.delete) {
+      handleDelete(nextProps.that, nextProps.nodeName, nextProps.state.nodeId);
+      //Return delete flag to 0 again and empty props and nodeId
+      nextProps.handleStateChange("delete");
     }
+  }
+
+  //Render function supposed to be pure, can't contain state-changing
+  render() {
     return null;
   }
 }

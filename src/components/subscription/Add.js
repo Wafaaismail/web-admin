@@ -4,7 +4,7 @@ import uuid from "../../helpers/uuid";
 import resolvers from "../../../../server/db_utils/schema/resolvers";
 
 //Handling Add action
-const handleAdd = (that, nodeName, props, handleStateChange) => {
+const handleAdd = (that, nodeName, props) => {
   let id = uuid();
   const data = { [id]: { id, ...props } };
 
@@ -12,28 +12,27 @@ const handleAdd = (that, nodeName, props, handleStateChange) => {
   gun.get(nodeName).put(data);
 
   //Add new node in redux
-  gun.map().on(() => {
-    that.props.add(nodeName, data);
+  gun.get(nodeName).map(obj => {
+    that.props.add(nodeName, data[id]);
   });
 
   //Add new node in graph
   // resolvers.Mutation.createNode({}, { nodelabel: nodeName, nodeArgs: data.id });
-
-  //Return add flag to 0 again
-  handleStateChange("add");
 };
 
 //Component that renders nothing
 export default class Add extends Component {
-  render() {
-    if (this.props.state.add) {
-      handleAdd(
-        this.props.that,
-        this.props.nodeName,
-        this.props.state.props,
-        this.props.handleStateChange
-      );
+  //Called whenever change occurs whether in props or state
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.state.add) {
+      handleAdd(nextProps.that, nextProps.nodeName, nextProps.state.props);
+      //Return add flag to 0 and empty props and nodeId
+      nextProps.handleStateChange("add");
     }
+  }
+
+  //Render function supposed to be pure, can't contain state-changing
+  render() {
     return null;
   }
 }

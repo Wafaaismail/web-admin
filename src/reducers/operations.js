@@ -2,33 +2,25 @@ import { omit } from "lodash";
 
 export const operations = {
   add: (state, action) => {
-    // copy current state
-    const newState = cloneDeep(state);
-
-    // create uuid
-    //modefied, id will be created from gun and sent to redux
-    // const UUID = uuid()
-
-    // add a new node (id: { ...props })
-    newState.data[action.payload.id] = { ...action.payload };
-
-    return newState;
+    // Create node and return new State
+    return {
+      ...state,
+      [action.payload.id]: action.payload
+    };
   },
   update: (state, action) => {
-    // copy current state
-    const newState = cloneDeep(state);
-    //Update props for existing node
-    newState.data[action.nodeId] = {
-      ...newState.data[action.nodeId],
-      ...action.payload
+    //Update props for existing node and return new state
+    return {
+      ...state,
+      [action.nodeId]: {
+        ...state[action.nodeId],
+        ...action.payload
+      }
     };
-    return newState;
   },
-  delete: (state, action) => {
-    // copy current state
-    const newState = cloneDeep(state);
-    //Delete Existing node
-    newState = omit(newState, action.nodeId);
-    return newState;
+  erase: (state, action) => {
+    console.log("delete");
+    //Delete Existing node and return new state
+    return omit(state, action.nodeId);
   }
 };

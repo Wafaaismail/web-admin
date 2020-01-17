@@ -5,6 +5,7 @@ export const normalizedMapDispatchToProps = dispatch => ({
       type: `add_${reducer}`,
       payload: data
     }),
+
   //Update action dispatcher
   update: (reducer, nodeId, data) =>
     dispatch({
@@ -12,10 +13,11 @@ export const normalizedMapDispatchToProps = dispatch => ({
       nodeId,
       payload: data
     }),
+
   //Delete action dispatcher
-  delete: (reducer, nodeId) =>
+  erase: (reducer, nodeId) =>
     dispatch({
-      type: `delete_${reducer}`,
+      type: `erase_${reducer}`,
       nodeId
     })
 });
