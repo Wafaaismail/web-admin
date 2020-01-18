@@ -3,6 +3,13 @@ import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { connect } from "react-redux";
 import Subscription from "./subscription/index";
 import Search from "./Search";
+import ApolloClient from 'apollo-boost';
+import { ApolloProvider } from 'react-apollo';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+const client = new ApolloClient({
+  uri:"http://localhost:3030/graphql"
+});
+
 class App extends Component {
   state = {
     add: 0,
@@ -19,9 +26,12 @@ class App extends Component {
 
   render() {
     return (
+      <ApolloProvider client={client}>
+      <Router>
       <div>
         <h1>Welcome to My React App!!</h1>
-        <Search />
+        <Search/>
+        {/* <Route exact path="/" component={Search} /> */}
         //Testing subscription component
         {/* <button
           onClick={() => {
@@ -58,6 +68,8 @@ class App extends Component {
           handleStateChange={this.handleStateChange}
         /> */}
       </div>
+      </Router>
+      </ApolloProvider>
     );
   }
 }
