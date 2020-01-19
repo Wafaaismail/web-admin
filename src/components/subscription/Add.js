@@ -17,7 +17,10 @@ const handleAdd = (that, nodeName, props) => {
   });
 
   //Add new node in graph
-  // resolvers.Mutation.createNode({}, { nodelabel: nodeName, nodeArgs: data.id });
+  resolvers.Mutation.createNode(
+    {},
+    { nodelabel: nodeName, nodeArgs: { id, ...props } }
+  );
 };
 
 //Component that renders nothing

@@ -19,7 +19,7 @@ const handleDelete = (that, nodeName, nodeId) => {
     });
 
   //Delete node from graph
-  // resolvers.Mutation.deleteNode({}, { nodeId });
+  resolvers.Mutation.deleteNode({}, { nodeId });
 };
 
 //Component that renders nothing

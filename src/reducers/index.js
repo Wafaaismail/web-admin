@@ -34,7 +34,7 @@ const buildReducers = () => {
         },
         {}
       );
-      console.log(handlers);
+      // console.log(handlers);
       result[reducerName] = (state = getData(reducerName), action) => {
         return get(handlers, action.type, d => d)(state, action);
       };
