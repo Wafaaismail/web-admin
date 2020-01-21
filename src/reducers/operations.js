@@ -19,7 +19,6 @@ export const operations = {
     };
   },
   erase: (state, action) => {
-    console.log("delete");
     //Delete Existing node and return new state
     return omit(state, action.nodeId);
   }

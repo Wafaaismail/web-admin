@@ -11,15 +11,15 @@ const handleDelete = (that, nodeName, nodeId) => {
     .put(null);
 
   //Delete node from redux
-  gun
-    .get(nodeName)
-    .map()
-    .on(() => {
-      that.props.erase(nodeName, nodeId);
-    });
+  // gun
+  //   .get(nodeName)
+  //   .map()
+  //   .on(() => {
+  that.props.erase(nodeName, nodeId);
+  // });
 
   //Delete node from graph
-  // resolvers.Mutation.deleteNode({}, { nodeId });
+  resolvers.Mutation.deleteNode({}, { nodeId });
 };
 
 //Component that renders nothing

@@ -6,19 +6,27 @@ import resolvers from "../../../../server/db_utils/schema/resolvers";
 const handleUpdate = (that, nodeName, nodeId, props) => {
   const data = { ...props };
 
-  //Update node props in gun
+  //First check if the node actually exists to be updated
   gun
     .get(nodeName)
     .get(nodeId)
-    .put(data);
+    .once(obj => {
+      if (obj) {
+        //Update node props in gun
+        gun
+          .get(nodeName)
+          .get(nodeId)
+          .put(data);
 
-  //Update node props in redux
-  gun.get(nodeName).map(() => {
-    that.props.update(nodeName, nodeId, data);
-  });
+        //Update node props in redux
+        // gun.get(nodeName).map(() => {
+        that.props.update(nodeName, nodeId, data);
+        // });
 
-  //Update node props in graph
-  // resolvers.Mutation.updateNode({}, { nodeId, nodeArgs: data });
+        //Update node props in graph
+        resolvers.Mutation.updateNode({}, { nodeId, nodeArgs: data });
+      }
+    });
 };
 
 //Component that renders nothing
