@@ -3,6 +3,7 @@ import { gun } from "./initGun";
 import { map } from "lodash";
 import uuid from "../../helpers/uuid";
 import resolvers from "../../../../server/db_utils/schema/resolvers";
+import session from "../../../../server/db_utils/session";
 
 //Handling Add action
 const handleAdd = async (that, node) => {
