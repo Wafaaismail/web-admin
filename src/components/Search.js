@@ -66,8 +66,8 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export default function PrimarySearchAppBar() {
-  const classes = useStyles()
-  const [anchorEl, setAnchorEl] = React.useState(null)
+  // const classes = useStyles()
+  // const [anchorEl, setAnchorEl] = React.useState(null)
 
   return (
     <div className={classes.grow}>
@@ -96,8 +96,11 @@ export default function PrimarySearchAppBar() {
           if (error) console.log(error);
 
           return (
-            <div>{data.search}</div>
-          );
+            <>
+            <div>{data.search}
+            </div>
+            </>
+          )
         }}
 
       </Query>

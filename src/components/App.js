@@ -6,6 +6,7 @@ import Search from "./Search";
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Popup from './popup-stations'
 const client = new ApolloClient({
   uri:"http://localhost:3030/graphql"
 });
@@ -27,10 +28,15 @@ class App extends Component {
   render() {
     return (
       <ApolloProvider client={client}>
-      <Router>
+      {/* <Router> */}
       <div>
         <h1>Welcome to My React App!!</h1>
-        <Search/>
+        </div>
+        <Popup/>
+        {/* <button type="button" onClick={handleOpen}>
+          Add pop
+      </button> */}
+        {/* <Search/> */}
         {/* <Route exact path="/" component={Search} /> */}
         //Testing subscription component
         {/* <button
@@ -67,8 +73,8 @@ class App extends Component {
           nodeName="station"
           handleStateChange={this.handleStateChange}
         /> */}
-      </div>
-      </Router>
+     
+      {/* </Router> */}
       </ApolloProvider>
     );
   }
