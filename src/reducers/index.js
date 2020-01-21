@@ -4,7 +4,7 @@ import { gun } from "../components/subscription/initGun";
 import { operations } from "./operations";
 
 // reducers names
-const reducerNames = ["station", "journey", "trip"];
+const reducerNames = ["station", "journey", "trip","journeyByStation","stationByCity","cityOptions"];
 // operation names
 const operationNames = ["add", "update", "erase"];
 
