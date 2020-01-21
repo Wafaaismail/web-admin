@@ -32,8 +32,8 @@ class App extends Component {
       <Router>
       <div>
         {/* <h1>Welcome to My React App!!</h1> */}
-        {/* <Search/> */}
-        <SearchStations/>
+        <Search/>
+        {/* <SearchStations/> */}
         {/* <Route exact path="/" component={Search} /> */}
         {/* //Testing subscription component */}
         {/* <button
