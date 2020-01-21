@@ -3,9 +3,11 @@ import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { connect } from "react-redux";
 import Subscription from "./subscription/index";
 import Search from "./Search";
-import ApolloClient from "apollo-boost";
-import { ApolloProvider } from "react-apollo";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import ApolloClient from 'apollo-boost';
+import { ApolloProvider } from 'react-apollo';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import SearchStations from "./searchStations";
+
 const client = new ApolloClient({
   uri: "http://localhost:3030/graphql"
 });
