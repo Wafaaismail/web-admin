@@ -8,6 +8,7 @@ import { ApolloProvider } from 'react-apollo';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Popup from './popup-stations'
 import SearchStations from "./searchStations";
+import JourneyApp from './journeyApp'
 
 const client = new ApolloClient({
   uri: "http://localhost:3030/graphql"
@@ -57,18 +58,20 @@ class App extends Component {
   render() {
     return (
       <ApolloProvider client={client}>
-      {/* <Router> */}
-      <div>
-        <h1>Welcome to My React App!!</h1>
+        {/* <Router> */}
+        <div>
+          <h1>Welcome to My React App!!</h1>
+          <JourneyApp />
         </div>
-        <Popup/>
+
+        <Popup />
         {/* <button type="button" onClick={handleOpen}>
           Add pop
       </button> */}
         {/* <Search/> */}
         {/* <Route exact path="/" component={Search} /> */}
-        
-          {/* **Testing subscription component**
+
+        {/* **Testing subscription component**
           <button
             onClick={() => {
               this.setState({ add: 1, node: stationGraph.node });
@@ -116,7 +119,6 @@ class App extends Component {
     );
   }
 }
-
 // get data from redux
 const mapStateToProps = state => {
   return {
