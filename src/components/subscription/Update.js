@@ -19,9 +19,9 @@ const handleUpdate = (that, nodeName, nodeId, props) => {
           .put(data);
 
         //Update node props in redux
-        gun.get(nodeName).map(() => {
-          that.props.update(nodeName, nodeId, data);
-        });
+        // gun.get(nodeName).map(() => {
+        that.props.update(nodeName, nodeId, data);
+        // });
 
         //Update node props in graph
         resolvers.Mutation.updateNode({}, { nodeId, nodeArgs: data });

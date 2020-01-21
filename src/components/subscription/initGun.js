@@ -1,3 +1,3 @@
 import Gun from "gun/gun";
 
-export var gun = Gun({ station: {}, journey: {} });
+export var gun = Gun({ station: {}, journey: {}, trip: {} });

@@ -4,7 +4,7 @@ import { gun } from "../components/subscription/initGun";
 import { operations } from "./operations";
 
 // reducers names
-const reducerNames = ["station", "journey"];
+const reducerNames = ["station", "journey", "trip"];
 // operation names
 const operationNames = ["add", "update", "erase"];
 
@@ -12,7 +12,9 @@ const getData = name => {
   let state = {};
 
   //Getting nodes from gunDB and send them to redux state
-  gun.get(name).map((obj, id) => (state = { ...state, [id]: omit(obj, "_") }));
+  gun
+    .get(name)
+    .map((object, id) => (state = { ...state, [id]: omit(object, "_") }));
 
   return state;
 };
