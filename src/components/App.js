@@ -6,7 +6,9 @@ import Search from "./Search";
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Popup from './popup-stations'
 import SearchStations from "./searchStations";
+import JourneyApp from './journeyApp'
 
 const client = new ApolloClient({
   uri: "http://localhost:3030/graphql"
@@ -59,10 +61,24 @@ class App extends Component {
         {/* <Router> */}
         <div>
           <h1>Welcome to My React App!!</h1>
+<<<<<<< HEAD
           <Search />
           {/* <Route exact path="/" component={Search} /> */}
 
           {/* **Testing subscription component**
+=======
+          <JourneyApp />
+        </div>
+
+        <Popup />
+        {/* <button type="button" onClick={handleOpen}>
+          Add pop
+      </button> */}
+        {/* <Search/> */}
+        {/* <Route exact path="/" component={Search} /> */}
+
+        {/* **Testing subscription component**
+>>>>>>> b47e8ff2424916f7ca88855c188633f9b8275689
           <button
             onClick={() => {
               this.setState({ add: 1, node: stationGraph.node });
@@ -103,15 +119,19 @@ class App extends Component {
             state={this.state}
             nodeName="station"
             handleStateChange={this.handleStateChange}
+<<<<<<< HEAD
           />
         </div> */}
         </div>
+=======
+          /> */}
+        {/* </div> */}
+>>>>>>> b47e8ff2424916f7ca88855c188633f9b8275689
         {/* </Router> */}
       </ApolloProvider>
     );
   }
 }
-
 // get data from redux
 const mapStateToProps = state => {
   return {

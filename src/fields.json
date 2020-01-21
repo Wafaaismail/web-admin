@@ -1,0 +1,15 @@
+{
+    "select":{
+        "label":"select",
+        "name" :"select",
+        "type":"Select"
+        },
+        
+    "station":
+    {
+        "label":"station",
+        "name": "station",
+        "type": "Text"
+       
+    }
+}
