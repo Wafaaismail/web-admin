@@ -6,6 +6,8 @@ import Search from "./Search";
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
+import SearchStations from "./searchStations";
+
 const client = new ApolloClient({
   uri:"http://localhost:3030/graphql"
 });
@@ -29,10 +31,11 @@ class App extends Component {
       <ApolloProvider client={client}>
       <Router>
       <div>
-        <h1>Welcome to My React App!!</h1>
-        <Search/>
+        {/* <h1>Welcome to My React App!!</h1> */}
+        {/* <Search/> */}
+        <SearchStations/>
         {/* <Route exact path="/" component={Search} /> */}
-        //Testing subscription component
+        {/* //Testing subscription component */}
         {/* <button
           onClick={() => {
             this.setState({ add: 1, props: { start: "f5", end: "455" } });
