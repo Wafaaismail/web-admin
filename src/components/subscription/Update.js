@@ -36,12 +36,12 @@ export default class Update extends Component {
     if (nextProps.state.update) {
       handleUpdate(
         nextProps.that,
-        nextProps.nodeName,
+        nextProps.state.nodeName,
         nextProps.state.nodeId,
         nextProps.state.props
       );
       //Return update flag to 0 and empty props and nodeId
-      nextProps.handleStateChange("update");
+      nextProps.handleStateReset("update");
     }
   }
 

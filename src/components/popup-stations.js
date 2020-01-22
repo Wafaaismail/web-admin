@@ -146,7 +146,19 @@ function rand() {
     },
   }));
   
-  export default function SimpleModal() {
+  export default function SimpleModal(props) {
+    let node = {
+      node: {
+        name: "station",
+        props: {},
+        relations: [{ type: "EXISTS_IN", with: "123" }]
+      }
+    };
+    const handleChangingState = (stationName) => {
+      node.node.props = {name: stationName}
+      props.handleChangingState("station",node)
+      // console.log(node)
+    }
     const classes = useStyles();
     // getModalStyle is not a pure function, we roll the style only on the first render
     const [modalStyle] = React.useState(getModalStyle);
@@ -163,7 +175,7 @@ function rand() {
     return (
       <div>
         {/* <button type="button" onClick={handleOpen}> */}
-        <Button variant="contained" color="secondary" onClick={handleOpen}> Open Modal</Button>
+        <Button variant="contained" color="secondary" onClick={handleOpen}> Add New</Button>
          
         {/* </button> */}
        
@@ -176,13 +188,18 @@ function rand() {
           <div style={modalStyle} className={classes.paper}>
             <h2 id="simple-modal-title">Stations</h2>
             <Formik 
-               initialValues={{ addstation:" " }}><Form>
-                    {/* <Field type="Text" name="addstation" placeholder="add"  /> */}
-                    <TextField id="filled-basic" label="Filled" variant="filled" />
-                    <Button variant="contained" color="secondary">
+               initialValues={{ addStation:"" }}
+               onSubmit={values =>{
+                handleChangingState(values.addStation)}}
+                ><Form>
+                    <Field type="Text" id="addStation" name="addStation" placeholder="station name"  />
+                    {/* <TextField id="filled-basic" label="Filled" variant="filled" /> */}
+                    <Button variant="contained" color="secondary" type="submit">
                      Add
                     </Button>
-                    {/* <button key="submit" htmlType="submit" type="primary" >
+                    {/* <button key="submit" htmlType="submit" type="primary" onClick={(values)=>{
+                      console.log(values)
+                      handleChangingState(values)}}>
                 Add
             </button> */}
                     </Form>

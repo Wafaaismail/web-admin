@@ -11,21 +11,18 @@ export default class index extends Component {
       <div>
         <Add
           that={this.props.that}
-          nodeName={this.props.nodeName}
           state={this.props.state}
-          handleStateChange={this.props.handleStateChange}
+          handleStateReset={this.props.handleStateReset}
         />
         <Update
           that={this.props.that}
-          nodeName={this.props.nodeName}
           state={this.props.state}
-          handleStateChange={this.props.handleStateChange}
+          handleStateReset={this.props.handleStateReset}
         />
         <Delete
           that={this.props.that}
-          nodeName={this.props.nodeName}
           state={this.props.state}
-          handleStateChange={this.props.handleStateChange}
+          handleStateReset={this.props.handleStateReset}
         />
       </div>
     );
