@@ -93,16 +93,16 @@ class Search extends Component{
     }
 
      handleTextFieldChange =(event)=>{
-      // console.log('onchange',executeQuery(searchTerm(event.target.value)))
-      console.log('searchTerm: ', event.target.value)
-      const result = this.executeQuery(searchTerm, event.target.value , "cityOptions")
-      result.then(result => {
-        console.log('query result', result))
-        map(result.data.normalizedSearch, cityObj => {
-          this.executeQuery(getCountryByCityId, cityObj.id, )
-        })
-      }
-      event.target.value ? result : console.log("No search term")
+      // // console.log('onchange',executeQuery(searchTerm(event.target.value)))
+      // console.log('searchTerm: ', event.target.value)
+      // const result = this.executeQuery(searchTerm, event.target.value , "cityOptions")
+      // result.then(result => {
+      //   console.log('query result', result))
+      //   map(result.data.normalizedSearch, cityObj => {
+      //     this.executeQuery(getCountryByCityId, cityObj.id, )
+      //   })
+      // }
+      // event.target.value ? result : console.log("No search term")
     }
     
     render(){

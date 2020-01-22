@@ -61,12 +61,10 @@ class App extends Component {
         {/* <Router> */}
         <div>
           <h1>Welcome to My React App!!</h1>
-<<<<<<< HEAD
           <Search />
           {/* <Route exact path="/" component={Search} /> */}
 
           {/* **Testing subscription component**
-=======
           <JourneyApp />
         </div>
 
@@ -78,7 +76,6 @@ class App extends Component {
         {/* <Route exact path="/" component={Search} /> */}
 
         {/* **Testing subscription component**
->>>>>>> b47e8ff2424916f7ca88855c188633f9b8275689
           <button
             onClick={() => {
               this.setState({ add: 1, node: stationGraph.node });
@@ -119,14 +116,9 @@ class App extends Component {
             state={this.state}
             nodeName="station"
             handleStateChange={this.handleStateChange}
-<<<<<<< HEAD
           />
         </div> */}
         </div>
-=======
-          /> */}
-        {/* </div> */}
->>>>>>> b47e8ff2424916f7ca88855c188633f9b8275689
         {/* </Router> */}
       </ApolloProvider>
     );

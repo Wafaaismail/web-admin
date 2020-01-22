@@ -3,8 +3,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: "./src/index.js",
-  watch: true,
-  "mode": "development",
+  // watch: true,
+  // "mode": "development",
   output: {
     path: path.join(__dirname, "/dist"),
     filename: "index_bundle.js"
@@ -21,8 +21,8 @@ module.exports = {
     ]
   },
   plugins: [
-    // new HtmlWebpackPlugin({
-    //   filename: "./index.js"
-    // })
+    new HtmlWebpackPlugin({
+      template:"./src/index.html"
+    })
   ]
 };
