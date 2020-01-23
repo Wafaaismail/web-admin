@@ -4,7 +4,7 @@ import { gun } from "../components/subscription/initGun";
 import { operations } from "./operations";
 
 // reducers names
-const reducerNames = ["station", "journey", "trip","journeyByStation","stationByCity","cityOptions"];
+const reducerNames = ["station", "journey", "trip","city_data", "station_data", "country_data", "relations_data"];
 // operation names
 const operationNames = ["add", "update", "erase"];
 
@@ -15,6 +15,8 @@ const getData = name => {
   gun
     .get(name)
     .map((object, id) => (state = { ...state, [id]: omit(object, "_") }));
+
+  
 
   return state;
 };
