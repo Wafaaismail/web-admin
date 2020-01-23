@@ -13,14 +13,14 @@ import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { map ,omit} from 'lodash'
 
 // query generators
-const getCountryCityByPartialCityName = (partialCityName) => {
+const querySearchOptions = (partialCityName) => {
   const QUERY = `
   {
     normalizedSearch(
       settings: {
         searchNode: "city"
         matchByPartialProp: {name: "${partialCityName}"}
-        searchReturn: "self, rel1, relative1, rel2, relative2"
+        searchReturn: "self, relative1, relative2"
         relative1: "station"
         relative2: "country"
       }  
@@ -29,73 +29,99 @@ const getCountryCityByPartialCityName = (partialCityName) => {
   `
   // console.log('QUERY', QUERY)
   return gql(QUERY)
-
 }
-const getStationsByCityId = (cityId) => {
-  const QUERY = `
-  query{
-    normalizedSearch(
-      settings: {
-        searchNode: "city"
-        matchByExactProps: {id: "${cityId}"}
-        searchReturn: "relative1"
-        relative1: "station"
-      }  
-    )
-  }
-  `
-  // console.log('QUERY', QUERY)
-  return gql(QUERY)
-}
-
         
 class Search extends Component {
-   
-  executeQuery = (querySignature, input, reducerName) => {
+  
+  prepareOptions = () => {
+    const { state, searchType } = this.props
+    const countries = state.country_data
+    const cities = state.city_data
+    const stations = state.station_data
+    const relations = state.relations_data
+    console.log('MY STATE: ', state)
+    let FinalOptions = ''
+
+    const stationSearchOptions = []
+    map(relations, (relationObj, relationId) => {
+      // console.log('countryid',relationObj.countryId)
+      // console.log('cityid',relationObj.cityId)
+      // console.log('cond',relationObj.countryId && relationObj.cityId)
+
+      if (relationObj.countryId) {
+        // console.log('RELATION OBJECT: ', relationObj)
+        const city = cities[relationObj.cityId]
+        const country = countries[relationObj.countryId]
+        // console.log('COUNTRY: ', country)
+        const option = {cityId: city.id, countryName: country.name, cityName: city.name}
+        console.log(option)
+        stationSearchOptions.push(option)
+        // console.log('dddddddddd',countries[relationObj.countryId])
+      }
+    })
+    FinalOptions = stationSearchOptions
+    console.log(FinalOptions)
+
+    if (searchType !== 'station') {
+      const journeySearchOptions = []
+      map(stationSearchOptions, option => {
+        const stationsForCity = []
+        map(relations, relationObj => {
+          if (relationObj.stationId && relationObj.cityId && relationObj.cityId == option.cityId) {
+            stationsForCity.push(stations[relationObj.stationId])
+          }
+        })
+        map(stationsForCity, stationObj => {
+          const optionWithStation = { ...option, stationName: stationObj.name}
+          journeySearchOptions.push(optionWithStation)
+        })
+      })
+      FinalOptions = journeySearchOptions
+    }
+
+    console.log('options: ', FinalOptions)
+    return FinalOptions
+  } 
+
+
+
+  executeQuery = (querySignature, input) => {
     this.props.client.query({
       query: querySignature(input)
     })
     .then(results => {
-      console.log('result', results)
+      console.log('result before adding to gun', results)
       // send data to redux here 
 
-      map(results.data.normalizedSearch,(data,reducer_name)=>{
-        console.log("re",reducer_name)
-        map(data,(val,key)=>{
-          console.log("data",data)
-          console.log("val",val)
-          gun.get(reducer_name).get(key).put(val)
+      map(results.data.normalizedSearch, (data, reducer_name) => { 
+        console.log("reducer", reducer_name)
+        console.log("reducer data", data)
+        map(data, (val,key)=>{
+          // gun.get(reducer_name).get(key).put(val)
           this.props.add(reducer_name,val)
-
-
         })
       })
     })
     .catch(error => console.error(error));
   }
     
-     handleAutocompleteChange = (event, option) => {
-      option ? this.executeQuery(getStationsByCityId, option.id, "stationByCity") : console.log("No option is selected")
+    handleAutocompleteChange = (event, option) => {
+      console.log('Option: ', option.cityId)
     }
 
      handleTextFieldChange =(event)=>{
       console.log('searchTerm: ', event.target.value)
       event.target.value ? 
-        this.executeQuery(getCountryCityByPartialCityName, event.target.value , "cityOptions")
+        this.executeQuery(querySearchOptions, event.target.value)
         : console.log("No term is entered")
     }
     
     render() {
-      // console.log(this.props.state)
-      console.log(map(this.props.state.city_data, option => option))
       return (
         <>
           <Autocomplete
-            options={map(this.props.state.cityOptions, option => option)}
-            getOptionLabel={option => {
-              
-              console.log('option',option)
-              `${option.country.name}, ${option.city.name}`}}
+            options={this.prepareOptions()}
+            getOptionLabel={option => `${option.countryName}, ${option.cityName}`}
             onChange={this.handleAutocompleteChange} 
             renderInput={params => (
               <TextField {...params} label="Search" onChange={this.handleTextFieldChange} variant="outlined" fullWidth />
