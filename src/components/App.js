@@ -8,7 +8,7 @@ import { ApolloProvider } from 'react-apollo';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Popup from './popup-stations'
 import SearchStations from "./searchStations";
-import JourneyApp from './journeyApp'
+import JourneyApp from './createJourney/journeyApp'
 
 const client = new ApolloClient({
   uri: "http://localhost:3030/graphql"
@@ -60,11 +60,11 @@ class App extends Component {
       <ApolloProvider client={client}>
         {/* <Router> */}
         <div>
-          <h1>Welcome to My React App!!</h1>
+          {/* <h1>Welcome to My React App!!</h1> */}
           <JourneyApp />
+          {/* <Popup /> */}
         </div>
 
-        <Popup />
         {/* <button type="button" onClick={handleOpen}>
           Add pop
       </button> */}
