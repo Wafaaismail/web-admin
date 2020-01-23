@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import JourneyMutation from './journeyMutation';
 import { map } from 'lodash'
 import Button from '@material-ui/core/Button';
-import uuid from '../helpers/uuid'
+import uuid from '../../helpers/uuid'
 
 
 class JourneyApp extends Component {

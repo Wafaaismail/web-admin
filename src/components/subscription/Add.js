@@ -49,9 +49,9 @@ export default class Add extends Component {
   //Called whenever change occurs whether in props or state
   componentWillReceiveProps(nextProps) {
     if (nextProps.state.add) {
-      handleAdd(nextProps.that, nextProps.state.node);
+      handleAdd(nextProps.that, nextProps.state.node.node);
       //Return add flag to 0 and empty props and nodeId+
-      nextProps.handleStateChange("add");
+      nextProps.handleStateReset("add");
     }
   }
 

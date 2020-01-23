@@ -27,9 +27,9 @@ export default class Delete extends Component {
   //Called whenever change occurs whether in props or state
   componentWillReceiveProps(nextProps) {
     if (nextProps.state.delete) {
-      handleDelete(nextProps.that, nextProps.nodeName, nextProps.state.nodeId);
+      handleDelete(nextProps.that, nextProps.state.nodeName, nextProps.state.nodeId);
       //Return delete flag to 0 again and empty props and nodeId
-      nextProps.handleStateChange("delete");
+      nextProps.handleStateReset("delete");
     }
   }
 

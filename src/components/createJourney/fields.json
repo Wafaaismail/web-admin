@@ -1,0 +1,14 @@
+{
+    "date": {
+        "type": "HandleDateTime",
+        "name": "date",
+        "placeholder": "Pick Your Date",
+        "validations": {}
+    },
+    "selectVehicle": {
+        "type": "VehicleSelects",
+        "name": "select",
+        "placeholder": "selectVehicle",
+        "validations": {}
+    }
+}
