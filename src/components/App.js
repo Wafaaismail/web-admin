@@ -42,6 +42,7 @@ let stationGraph = {
 };
 class App extends Component {
   state = {
+    nodeName: "",
     add: 0,
     update: 0,
     delete: 0,
@@ -51,16 +52,30 @@ class App extends Component {
   };
 
   //Returns the state to initial after calling any action
-  handleStateChange = prop => {
+  handleStateReset = prop => {
     this.setState({ [prop]: 0, nodeId: "", props: {}, node: {} });
   };
+
+  //Store data for the node to be added
+  handleChangingState = (nodeName,node) => {
+    this.setState({node, nodeName, add: 1})
+  }
 
   render() {
     return (
       <ApolloProvider client={client}>
         {/* <Router> */}
         <div>
+<<<<<<< HEAD
           {/* <h1>Welcome to My React App!!</h1> */}
+=======
+          <h1>Welcome to My React App!!</h1>
+          <Popup handleChangingState={this.handleChangingState}/>
+          {/* <Search /> */}
+          {/* <Route exact path="/" component={Search} /> */}
+
+          {/* **Testing subscription component**
+>>>>>>> 6220f31594108b8de75afff257e2bd54e3d5dd6c
           <JourneyApp />
           {/* <Popup /> */}
         </div>
@@ -106,14 +121,13 @@ class App extends Component {
             }}
           >
             Delete
-          </button>
+          </button>*/}
           <Subscription
             that={this}
             state={this.state}
-            nodeName="station"
-            handleStateChange={this.handleStateChange}
-          /> */}
-        {/* </div> */}
+            handleStateReset={this.handleStateReset}
+          />
+        </div> 
         {/* </Router> */}
       </ApolloProvider>
     );
