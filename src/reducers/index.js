@@ -1,56 +1,69 @@
-import { combineReducers } from "redux";
-import { omit, get, reduce } from "lodash";
-import { gun } from "../components/subscription/initGun";
-import { operations } from "./operations";
+import { combineReducers } from 'redux'
+import { omit, get, reduce, map } from 'lodash'
+import { gun } from '../components/subscription/initGun'
 
 // reducers names
-const reducerNames = ["station", "journey", "trip","city_data", "station_data", "country_data", "relations_data"];
-// operation names
-const operationNames = ["add", "update", "erase"];
+const reducerNames = [
+  'station', 'journey', 'trip',
+  'city_data', 'station_data', 'country_data', 'relations_data']
 
-const getData = name => {
-  let state = {};
+// general action handlers: common logic to be executed when an action is dispatched
+const generalActionHandlers = {
+  add: (state, action) => {
+    // create node and return new State
+    return {
+      ...state,
+      [action.payload.id]: action.payload
+    }
+  },
+  update: (state, action) => {
+    // update props for existing node and return new state
+    return {
+      ...state,
+      [action.nodeId]: {
+        ...state[action.nodeId],
+        ...action.payload
+      }
+    }
+  },
+  erase: (state, action) => {
+    // delete Existing node and return new state
+    return omit(state, action.nodeId)
+  }
+}
 
-  //Getting nodes from gunDB and send them to redux state
+const getDataFromGun = reducerName => {
+  let state = {}
+
+  // Get nodes from gunDB and send them to redux state
   gun
-    .get(name)
-    .map((object, id) => (state = { ...state, [id]: omit(object, "_") }));
+    .get(reducerName)
+    .map((object, id) => (state = { ...state, [id]: omit(object, '_') }))
 
-  
-
-  return state;
-};
+  return state
+}
 
 const buildReducers = () => {
-  //Map on reducer name to create reducers for each one
-  const reducers = reduce(
-    reducerNames,
-    (result, reducerName) => {
-      //Map on operations name to create reducer for each action
-      const handlers = reduce(
-        operationNames,
-        (result, operationName) => {
-          result[`${operationName}_${reducerName}`] = get(
-            operations,
-            operationName
-          );
-          return result;
-        },
-        {}
-      );
-      // console.log(handlers);
-      result[reducerName] = (state = getData(reducerName), action) => {
-        return get(handlers, action.type, d => d)(state, action);
-      };
-      return result;
-    },
-    {}
-  );
-  return reducers;
-};
+  // map on reducer names to create the function for each reducer
+  const reducers = reduce(reducerNames, (result, reducerName) => {
 
-//Build reducers, combine them and send them to redux-store
-const createdReducers = buildReducers();
-const allReducers = combineReducers(createdReducers);
+    // create a copy of general action handlers for each reducer
+    const reducerActionHandlers = reduce(generalActionHandlers, (result, handlerFunc, handlerName) => {
+      result[`${handlerName}_${reducerName}`] = handlerFunc
+      return result
+    }, {})
 
-export default allReducers;
+    // create the final reducer function
+    result[reducerName] = (state = getDataFromGun(reducerName), action) => {
+      return get(reducerActionHandlers, action.type, d => d)(state, action)
+    }
+    return result
+  }, {})
+
+  return reducers
+}
+
+// build, combine and export reducers
+const createdReducers = buildReducers()
+const combinedReducers = combineReducers(createdReducers)
+export default combinedReducers
