@@ -8,7 +8,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import {connect } from 'react-redux'
 import { withApollo } from 'react-apollo';
 import uuid from '../helpers/uuid'
-import {gun} from './subscription/initGun'
+// import {gun} from './subscription/initGun'
 import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { map ,omit} from 'lodash'
 
@@ -39,7 +39,7 @@ class Search extends Component {
     const cities = state.city_data
     const stations = state.station_data
     const relations = state.relations_data
-    console.log('MY STATE: ', state)
+
     let FinalOptions = ''
 
     const stationSearchOptions = []
@@ -60,7 +60,7 @@ class Search extends Component {
       }
     })
     FinalOptions = stationSearchOptions
-    console.log(FinalOptions)
+    // console.log(FinalOptions)
 
     if (searchType !== 'station') {
       const journeySearchOptions = []
@@ -79,7 +79,7 @@ class Search extends Component {
       FinalOptions = journeySearchOptions
     }
 
-    console.log('options: ', FinalOptions)
+    // console.log('options: ', FinalOptions)
     return FinalOptions
   } 
 
@@ -90,45 +90,46 @@ class Search extends Component {
       query: querySignature(input)
     })
     .then(results => {
-      console.log('result before adding to gun', results)
-      // send data to redux here 
+      console.log('QUERY RESULTS FROM SERVER: ', results)
 
-      map(results.data.normalizedSearch, (data, reducer_name) => { 
-        console.log("reducer", reducer_name)
-        console.log("reducer data", data)
-        map(data, (val,key)=>{
-          // gun.get(reducer_name).get(key).put(val)
-          this.props.add(reducer_name,val)
-        })
-      })
+      // map(results.data.normalizedSearch, (reducerData, reducerName) => { 
+      //   console.log(`Results for ${reducerName}`, reducerData)
+      //   this.props.add(reducerName, map(reducerData, dataObj => dataObj))
+      // })
+      this.props.multiDispatchQueryResults(results.data.normalizedSearch)
+
     })
     .catch(error => console.error(error));
   }
     
-    handleAutocompleteChange = (event, option) => {
-      console.log('Option: ', option.cityId)
-    }
+  handleOptionSelected = (event, option) => {
+    console.log('Option: ', option.cityId)
+  }
 
-     handleTextFieldChange =(event)=>{
-      console.log('searchTerm: ', event.target.value)
-      event.target.value ? 
-        this.executeQuery(querySearchOptions, event.target.value)
-        : console.log("No term is entered")
-    }
-    
-    render() {
-      return (
-        <>
-          <Autocomplete
-            options={this.prepareOptions()}
-            getOptionLabel={option => `${option.countryName}, ${option.cityName}`}
-            onChange={this.handleAutocompleteChange} 
-            renderInput={params => (
-              <TextField {...params} label="Search" onChange={this.handleTextFieldChange} variant="outlined" fullWidth />
-            )}
-          />
-        </>
-      )
+  handleUserInput =(event)=>{
+    console.log('searchTerm: ', event.target.value)
+    event.target.value ? 
+      this.executeQuery(querySearchOptions, event.target.value)
+      : console.log("No term is entered")
+  }
+  
+  render() {
+    return (
+      <>
+        <Autocomplete
+          options={this.prepareOptions()}
+          getOptionLabel={option =>
+            option.stationName ?
+            `${option.countryName}, ${option.cityName}, ${option.stationName}` : 
+            `${option.countryName}, ${option.cityName}`
+          }
+          onChange={this.handleOptionSelected}
+          renderInput={params => (
+            <TextField {...params} label="Search" onChange={this.handleUserInput} variant="outlined" fullWidth />
+          )}
+        />
+      </>
+    )
   }
 }
 
