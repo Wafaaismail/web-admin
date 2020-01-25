@@ -10,8 +10,9 @@ import { withApollo } from 'react-apollo';
 import uuid from '../helpers/uuid'
 // import {gun} from './subscription/initGun'
 import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
-import { map ,omit} from 'lodash'
-
+import { map ,omit, flattenDeep, filter } from 'lodash'
+import { apply } from '../helpers/apply_function/apply'
+ 
 // query generators
 const querySearchOptions = (partialCityName) => {
   const QUERY = `
@@ -30,15 +31,40 @@ const querySearchOptions = (partialCityName) => {
   // console.log('QUERY', QUERY)
   return gql(QUERY)
 }
-        
+
 class Search extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      optionsFromRedux: []
+    }
+  }
   
-  prepareOptions = () => {
-    const { state, searchType } = this.props
-    const countries = state.country_data
-    const cities = state.city_data
-    const stations = state.station_data
-    const relations = state.relations_data
+  filterReduxForOptions = (searchTerm) => {
+    const { reduxState, searchType } = this.props
+    const countries = reduxState.country_data
+    const cities = reduxState.city_data
+    const stations = reduxState.station_data
+    let relations = reduxState.relations_data
+    
+    // get objects of cities that match partial name (search term)
+    const filteredCities = filter(cities, cityObj => 
+      cityObj.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    console.log("FILTERED CITIES: ", filteredCities)
+
+
+    // filter relations by city ids
+    relations = flattenDeep(
+      map(filteredCities, cityObj => {
+        return apply({
+            funcName: 'filtering',
+            pathInState: 'relations_data',
+            params: { cityId: cityObj.id }
+        }, relations)
+      })
+    )
+    console.log("FILTERED RELATIONS: ", relations)
 
     let FinalOptions = ''
 
@@ -54,7 +80,7 @@ class Search extends Component {
         const country = countries[relationObj.countryId]
         // console.log('COUNTRY: ', country)
         const option = {cityId: city.id, countryName: country.name, cityName: city.name}
-        console.log(option)
+        // console.log(option)
         stationSearchOptions.push(option)
         // console.log('dddddddddd',countries[relationObj.countryId])
       }
@@ -83,8 +109,6 @@ class Search extends Component {
     return FinalOptions
   } 
 
-
-
   executeQuery = (querySignature, input) => {
     this.props.client.query({
       query: querySignature(input)
@@ -106,18 +130,35 @@ class Search extends Component {
     console.log('Option: ', option.cityId)
   }
 
-  handleUserInput =(event)=>{
-    console.log('searchTerm: ', event.target.value)
-    event.target.value ? 
-      this.executeQuery(querySearchOptions, event.target.value)
-      : console.log("No term is entered")
+  myTimer = '' 
+  handleUserInput = (event) => {
+    // reuse the event for different values
+    event.persist()
+    // cancel previous timer if any
+    clearTimeout(this.myTimer)
+    // get search term and do the following if any
+    const searchTerm = event.target.value
+    if (searchTerm) {
+      // set new timer
+      this.myTimer = setTimeout(()=> {
+        console.log('searchTerm: ', searchTerm)
+        // apply filter on redux
+        const optionsFromRedux = this.filterReduxForOptions(searchTerm)
+        if (optionsFromRedux.length !== 0) {
+          this.setState({optionsFromRedux})
+        } else {
+          // execute query if there is a search term (the function automatically updates redux)
+          this.executeQuery(querySearchOptions, searchTerm)
+        }
+      }, 500)
+    } else {console.log("No term is entered")}
   }
   
   render() {
     return (
       <>
         <Autocomplete
-          options={this.prepareOptions()}
+          options={this.state.optionsFromRedux}
           getOptionLabel={option =>
             option.stationName ?
             `${option.countryName}, ${option.cityName}, ${option.stationName}` : 
@@ -125,7 +166,10 @@ class Search extends Component {
           }
           onChange={this.handleOptionSelected}
           renderInput={params => (
-            <TextField {...params} label="Search" onChange={this.handleUserInput} variant="outlined" fullWidth />
+            <TextField {...params} 
+              label={this.props.searchType == 'station' ? 'Search city and select one' : 'Search city and select station'} 
+              onChange={this.handleUserInput} 
+              variant="outlined" fullWidth />
           )}
         />
       </>
@@ -136,7 +180,7 @@ class Search extends Component {
 // get data from redux
 const mapStateToProps = state => {
   return {
-    state: state
+    reduxState: state
   };
 };
 

@@ -1,4 +1,4 @@
-import { filter, size } from 'lodash'
+import { filter, size, map } from 'lodash'
 
 export const filtering = (jsonPlan, data, state, props) => {
   return filter(data, jsonPlan.params)
