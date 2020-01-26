@@ -10,9 +10,8 @@ import Popup from './popup-add'
 import PopupEdit from './popup-edit'
 import SearchStations from "./searchStations";
 import Popup from './popup-stations'
-import SearchStations from "./searchResult_stations";
+import SearchResult from "./SearchResult";
 import JourneyApp from './createJourney/journeyApp'
-
 const client = new ApolloClient({
   uri: "http://localhost:3030/graphql"
 });
@@ -71,7 +70,9 @@ class App extends Component {
         <div>
           <h1>Welcome to My React App!!</h1>
           {/* <Popup handleChangingState={this.handleChangingState}/> */}
-          <Search searchType='journey' />
+          <Search searchType='station' />
+          {/* <SearchResult searchType='station'/> */}
+          {/* <SearchResult/> */}
           {/* <Route exact path="/" component={Search} /> */}
 
           {/* **Testing subscription component**

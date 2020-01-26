@@ -1,18 +1,15 @@
-import React, { Component ,useState } from 'react'
-import { fade, makeStyles } from '@material-ui/core/styles'
-import ResultExpansion from './ResultExpansion'
+import React, { Component } from 'react'
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import {connect } from 'react-redux'
+import { connect } from 'react-redux'
 import { withApollo } from 'react-apollo';
-import uuid from '../helpers/uuid'
 // import {gun} from './subscription/initGun'
 import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
-import { map ,omit, flattenDeep, filter } from 'lodash'
+import { map, flattenDeep, filter,get } from 'lodash'
 import { apply } from '../helpers/apply_function/apply'
- 
+import SearchResult from './SearchResult';
+
 // query generators
 const querySearchOptions = (partialCityName) => {
   const QUERY = `
@@ -36,19 +33,25 @@ class Search extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      optionsFromRedux: []
+      optionsFromRedux: [],
+      cityStations: []
     }
   }
-  
+
+  // componentWillUpdate() {
+  //   // this.setState({cityStations: })
+  //   console.log('Before Update')
+  // }
+
   filterReduxForOptions = (searchTerm) => {
     const { reduxState, searchType } = this.props
     const countries = reduxState.country_data
     const cities = reduxState.city_data
     const stations = reduxState.station_data
     let relations = reduxState.relations_data
-    
+
     // get objects of cities that match partial name (search term)
-    const filteredCities = filter(cities, cityObj => 
+    const filteredCities = filter(cities, cityObj =>
       cityObj.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     console.log("FILTERED CITIES: ", filteredCities)
@@ -58,9 +61,9 @@ class Search extends Component {
     relations = flattenDeep(
       map(filteredCities, cityObj => {
         return apply({
-            funcName: 'filtering',
-            pathInState: 'relations_data',
-            params: { cityId: cityObj.id }
+          funcName: 'filtering',
+          pathInState: 'relations_data',
+          params: { cityId: cityObj.id }
         }, relations)
       })
     )
@@ -79,7 +82,7 @@ class Search extends Component {
         const city = cities[relationObj.cityId]
         const country = countries[relationObj.countryId]
         // console.log('COUNTRY: ', country)
-        const option = {cityId: city.id, countryName: country.name, cityName: city.name}
+        const option = { cityId: city.id, countryName: country.name, cityName: city.name }
         // console.log(option)
         stationSearchOptions.push(option)
         // console.log('dddddddddd',countries[relationObj.countryId])
@@ -98,7 +101,7 @@ class Search extends Component {
           }
         })
         map(stationsForCity, stationObj => {
-          const optionWithStation = { ...option, stationName: stationObj.name}
+          const optionWithStation = { ...option, stationName: stationObj.name }
           journeySearchOptions.push(optionWithStation)
         })
       })
@@ -107,30 +110,49 @@ class Search extends Component {
 
     // console.log('options: ', FinalOptions)
     return FinalOptions
-  } 
+  }
 
   executeQuery = (querySignature, input) => {
     this.props.client.query({
       query: querySignature(input)
     })
-    .then(results => {
-      console.log('QUERY RESULTS FROM SERVER: ', results)
+      .then(results => {
+        console.log('QUERY RESULTS FROM SERVER: ', results)
+        // map(results.data.normalizedSearch, (reducerData, reducerName) => { 
+        //   console.log(`Results for ${reducerName}`, reducerData)
+        //   this.props.add(reducerName, map(reducerData, dataObj => dataObj))
+        // })
+        this.props.multiDispatchQueryResults(results.data.normalizedSearch)
 
-      // map(results.data.normalizedSearch, (reducerData, reducerName) => { 
-      //   console.log(`Results for ${reducerName}`, reducerData)
-      //   this.props.add(reducerName, map(reducerData, dataObj => dataObj))
-      // })
-      this.props.multiDispatchQueryResults(results.data.normalizedSearch)
-
-    })
-    .catch(error => console.error(error));
+      })
+      .catch(error => console.error(error));
   }
-    
+
   handleOptionSelected = (event, option) => {
     console.log('Option: ', option.cityId)
+    const stations = this.props.reduxState.station_data
+    console.log('STATIONS', stations)
+
+    // relationship object any cityid 
+    const firstFilter = apply({
+      funcName: 'filtering',
+      pathInState: 'relations_data',
+      params: { cityId: option.cityId }
+    })
+
+    console.log('s', firstFilter)
+
+    // relationship object contain cityid ,stationid
+    const secondFilter = filter(firstFilter, val => val.stationId)
+    console.log('s', secondFilter)
+
+    const cityStations = map(secondFilter, (relation)=> get(stations, relation.stationId, {})) 
+    
+    console.log('before set stea',cityStations)
+    this.setState({cityStations})
   }
 
-  myTimer = '' 
+  myTimer = ''
   handleUserInput = (event) => {
     // reuse the event for different values
     event.persist()
@@ -140,38 +162,41 @@ class Search extends Component {
     const searchTerm = event.target.value
     if (searchTerm) {
       // set new timer
-      this.myTimer = setTimeout(()=> {
+      this.myTimer = setTimeout(() => {
         console.log('searchTerm: ', searchTerm)
         // apply filter on redux
         const optionsFromRedux = this.filterReduxForOptions(searchTerm)
         if (optionsFromRedux.length !== 0) {
-          this.setState({optionsFromRedux})
+          this.setState({ optionsFromRedux })
         } else {
           // execute query if there is a search term (the function automatically updates redux)
           this.executeQuery(querySearchOptions, searchTerm)
         }
       }, 500)
-    } else {console.log("No term is entered")}
+    } else { console.log("No term is entered") }
   }
-  
+
   render() {
+    console.log('in search', this.state.cityStations,'redux', this.props.reduxState)
     return (
       <>
         <Autocomplete
           options={this.state.optionsFromRedux}
           getOptionLabel={option =>
             option.stationName ?
-            `${option.countryName}, ${option.cityName}, ${option.stationName}` : 
-            `${option.countryName}, ${option.cityName}`
+              `${option.countryName}, ${option.cityName}, ${option.stationName}` :
+              `${option.countryName}, ${option.cityName}`
           }
           onChange={this.handleOptionSelected}
           renderInput={params => (
-            <TextField {...params} 
-              label={this.props.searchType == 'station' ? 'Search city and select one' : 'Search city and select station'} 
-              onChange={this.handleUserInput} 
+            <TextField {...params}
+              label={this.props.searchType == 'station' ? 'Search city and select one' : 'Search city and select station'}
+              onChange={this.handleUserInput}
               variant="outlined" fullWidth />
           )}
         />
+        {console.log('inside search')}
+        <SearchResult searchType={this.props.searchType} data={this.state.cityStations}/>
       </>
     )
   }
@@ -184,4 +209,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default withApollo(connect(mapStateToProps, normalizedMapDispatchToProps)(Search));
+export default withApollo(connect(mapStateToProps, normalizedMapDispatchToProps)(Search))
