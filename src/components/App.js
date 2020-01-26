@@ -9,6 +9,8 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Popup from './popup-add'
 import PopupEdit from './popup-edit'
 import SearchStations from "./searchStations";
+import Popup from './popup-stations'
+import SearchStations from "./searchResult_stations";
 import JourneyApp from './createJourney/journeyApp'
 
 const client = new ApolloClient({
@@ -68,12 +70,12 @@ class App extends Component {
         {/* <Router> */}
         <div>
           <h1>Welcome to My React App!!</h1>
-          <Popup handleChangingState={this.handleChangingState}/>
-          <PopupEdit/>
-          {/* <Search /> */}
+          {/* <Popup handleChangingState={this.handleChangingState}/> */}
+          <Search searchType='journey' />
           {/* <Route exact path="/" component={Search} /> */}
 
           {/* **Testing subscription component**
+          <JourneyApp />
           {/* <Popup /> */}
         </div>
         <JourneyApp />
