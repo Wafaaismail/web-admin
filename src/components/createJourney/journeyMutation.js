@@ -65,9 +65,9 @@ export default function JourneyMutation(props) {
 
                                 {
                                     //map fields component dynamically from json file using middle component
-                                    map(fieldsJSON.default, (fieldSettings, index) => {
+                                    map(fieldsJSON.default, (value, index) => {
                                         return <RenderComponent key={index}
-                                            fieldSettings={{ ...fieldSettings }}
+                                            value={{ ...value }}
                                         />
                                     })
                                 }

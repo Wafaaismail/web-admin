@@ -8,8 +8,9 @@
     "station":
     {
         "label":"station",
-        "name": "station",
-        "type": "Text"
+        "name": "addStation",
+        "type": "Text",
+        "placeholder":"station"
        
     }
 }

@@ -18,7 +18,7 @@ export class Text extends Component{
             <div className="textfield">
                 <label style={{ width: "100 px" }}>{this.props.label}</label>
 
-                <input name={this.props.name} type="text"
+                <input name={this.props.name} type="Text"
                     onChange={(val) => this.handleChange(val)} />
 
             </div>

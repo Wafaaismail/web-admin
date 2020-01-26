@@ -6,7 +6,8 @@ import Search from "./Search";
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Popup from './popup-stations'
+import Popup from './popup-add'
+import PopupEdit from './popup-edit'
 import SearchStations from "./searchStations";
 import JourneyApp from './createJourney/journeyApp'
 
@@ -66,19 +67,16 @@ class App extends Component {
       <ApolloProvider client={client}>
         {/* <Router> */}
         <div>
-<<<<<<< HEAD
-          {/* <h1>Welcome to My React App!!</h1> */}
-=======
           <h1>Welcome to My React App!!</h1>
           <Popup handleChangingState={this.handleChangingState}/>
+          <PopupEdit/>
           {/* <Search /> */}
           {/* <Route exact path="/" component={Search} /> */}
 
           {/* **Testing subscription component**
->>>>>>> 6220f31594108b8de75afff257e2bd54e3d5dd6c
-          <JourneyApp />
           {/* <Popup /> */}
         </div>
+        <JourneyApp />
 
         {/* <button type="button" onClick={handleOpen}>
           Add pop
@@ -127,7 +125,7 @@ class App extends Component {
             state={this.state}
             handleStateReset={this.handleStateReset}
           />
-        </div> 
+        {/* </div>  */}
         {/* </Router> */}
       </ApolloProvider>
     );
