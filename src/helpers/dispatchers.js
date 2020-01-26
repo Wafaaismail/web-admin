@@ -1,29 +1,6 @@
 import { map } from 'lodash'
 
 export const normalizedMapDispatchToProps = dispatch => ({
-  // Add action dispatcher
-  add: (reducer, data) =>
-    dispatch({
-      type: `add_${reducer}`,
-      payload: data
-    }),
-
-  // add: (reducer, data) => {
-  //   if (data instanceof Array) {
-  //     const listOfActions = map(data, dataObj => ({
-  //       type: `add_${reducer}`,
-  //       payload: dataObj
-  //     }))
-  //     dispatch(listOfActions)
-  //   } else {
-  //     const oneAction = {
-  //       type: `add_${reducer}`,
-  //       payload: data
-  //     }
-  //     dispatch(oneAction)
-  //   }
-  // },
-
   multiDispatchQueryResults: (results) => {
     const listOfActions = []
     map(results, (reducerData, reducerName) => {
@@ -35,8 +12,13 @@ export const normalizedMapDispatchToProps = dispatch => ({
       })
     })
     dispatch(listOfActions)
-  },
-
+  },  
+  // Add action dispatcher
+  add: (reducer, data) =>
+    dispatch({
+      type: `add_${reducer}`,
+      payload: data
+    }),
   // Update action dispatcher
   update: (reducer, nodeId, data) =>
     dispatch({

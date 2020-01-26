@@ -32,123 +32,101 @@ const querySearchOptions = (partialCityName) => {
 class Search extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      optionsFromRedux: [],
-      cityStations: []
-    }
+    this.state = {}
   }
-
-  // componentWillUpdate() {
-  //   // this.setState({cityStations: })
-  //   console.log('Before Update')
-  // }
 
   filterReduxForOptions = (searchTerm) => {
     const { reduxState, searchType } = this.props
-    const countries = reduxState.country_data
-    const cities = reduxState.city_data
-    const stations = reduxState.station_data
-    let relations = reduxState.relations_data
 
-    // get objects of cities that match partial name (search term)
-    const filteredCities = filter(cities, cityObj =>
-      cityObj.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    console.log("FILTERED CITIES: ", filteredCities)
+    const finalOptions = []
 
-
-    // filter relations by city ids
-    relations = flattenDeep(
-      map(filteredCities, cityObj => {
-        return apply({
-          funcName: 'filtering',
-          pathInState: 'relations_data',
-          params: { cityId: cityObj.id }
-        }, relations)
-      })
-    )
-    console.log("FILTERED RELATIONS: ", relations)
-
-    let FinalOptions = ''
-
-    const stationSearchOptions = []
-    map(relations, (relationObj, relationId) => {
-      // console.log('countryid',relationObj.countryId)
-      // console.log('cityid',relationObj.cityId)
-      // console.log('cond',relationObj.countryId && relationObj.cityId)
-
-      if (relationObj.countryId) {
-        // console.log('RELATION OBJECT: ', relationObj)
-        const city = cities[relationObj.cityId]
-        const country = countries[relationObj.countryId]
-        // console.log('COUNTRY: ', country)
-        const option = { cityId: city.id, countryName: country.name, cityName: city.name }
-        // console.log(option)
-        stationSearchOptions.push(option)
-        // console.log('dddddddddd',countries[relationObj.countryId])
-      }
+    // get city objects that include search term
+    const cityObjs = apply({
+      funcName: 'filterByPartialProp',
+      pathInState: 'city_data',
+      params: { partialProp: { name: searchTerm } }
     })
-    FinalOptions = stationSearchOptions
-    // console.log(FinalOptions)
 
-    if (searchType !== 'station') {
-      const journeySearchOptions = []
-      map(stationSearchOptions, option => {
-        const stationsForCity = []
-        map(relations, relationObj => {
-          if (relationObj.stationId && relationObj.cityId && relationObj.cityId == option.cityId) {
-            stationsForCity.push(stations[relationObj.stationId])
+    // do the following for each city object
+    map(cityObjs, cityObj => {
+      // get country relation
+      const countryRelation = apply({
+        funcName: 'filterByKeyExists',
+        pathInState: 'relations_data',
+        params: { key: 'countryId' },
+        then: {
+          funcName: 'filterByExactProps',
+          params: { exactProps: { cityId: cityObj.id } }
+        }
+      })[0]
+      // get country obj
+      const countryObj = reduxState.country_data[countryRelation.countryId]
+      // option up to now
+      const option = { cityId: cityObj.id, countryName: countryObj.name, cityName: cityObj.name }
+      // go for stations if its a 'journey' search or push the option above
+      if (searchType !== 'station') {
+        // get station relations
+        const stationRelations = apply({
+          funcName: 'filterByKeyExists',
+          pathInState: 'relations_data',
+          params: { key: 'stationId' },
+          then: {
+            funcName: 'filterByExactProps',
+            params: { exactProps: { cityId: cityObj.id } }
           }
         })
-        map(stationsForCity, stationObj => {
-          const optionWithStation = { ...option, stationName: stationObj.name }
-          journeySearchOptions.push(optionWithStation)
+        // get station objs
+        const stationObjs = map(stationRelations, relation => 
+          apply({
+            funcName: 'filterByExactProps',
+            pathInState: 'station_data',
+            params: { exactProps: {id: relation.stationId} },
+          })[0]
+        )
+        // create and add options
+        map(stationObjs, stationObj => {
+          finalOptions.push({...option, stationName: stationObj.name})
         })
-      })
-      FinalOptions = journeySearchOptions
-    }
+      } else { finalOptions.push(option) }
+    })
 
-    // console.log('options: ', FinalOptions)
-    return FinalOptions
+    console.log('options: ', finalOptions)
+    return finalOptions
   }
 
   executeQuery = (querySignature, input) => {
     this.props.client.query({
       query: querySignature(input)
     })
-      .then(results => {
-        console.log('QUERY RESULTS FROM SERVER: ', results)
-        // map(results.data.normalizedSearch, (reducerData, reducerName) => { 
-        //   console.log(`Results for ${reducerName}`, reducerData)
-        //   this.props.add(reducerName, map(reducerData, dataObj => dataObj))
-        // })
-        this.props.multiDispatchQueryResults(results.data.normalizedSearch)
-
-      })
-      .catch(error => console.error(error));
+    .then(results => {
+      console.log('QUERY RESULTS FROM SERVER: ', results)
+      this.props.multiDispatchQueryResults(results.data.normalizedSearch)
+    })
+    .catch(error => console.error(error));
   }
 
   handleOptionSelected = (event, option) => {
-    console.log('Option: ', option.cityId)
-    const stations = this.props.reduxState.station_data
-    console.log('STATIONS', stations)
+    // console.log('Option: ', option.cityId)
 
-    // relationship object any cityid 
-    const firstFilter = apply({
-      funcName: 'filtering',
+    // get relations between our city and its stations 
+    const targetRelations = apply({
+      funcName: 'filterByExactProps',
       pathInState: 'relations_data',
-      params: { cityId: option.cityId }
+      params: { exactProps: {cityId: option.cityId} },
+      then: {
+        funcName: 'filterByKeyExists',
+        params: { key: 'stationId' }
+      }
     })
-
-    console.log('s', firstFilter)
-
-    // relationship object contain cityid ,stationid
-    const secondFilter = filter(firstFilter, val => val.stationId)
-    console.log('s', secondFilter)
-
-    const cityStations = map(secondFilter, (relation)=> get(stations, relation.stationId, {})) 
+    // get stations of the city
+    const cityStations = map(targetRelations, relation => 
+        apply({
+          funcName: 'filterByExactProps',
+          pathInState: 'station_data',
+          params: { exactProps: {id: relation.stationId} },
+        })[0]
+    )
     
-    console.log('before set stea',cityStations)
     this.setState({cityStations})
   }
 
@@ -190,7 +168,8 @@ class Search extends Component {
           onChange={this.handleOptionSelected}
           renderInput={params => (
             <TextField {...params}
-              label={this.props.searchType == 'station' ? 'Search city and select one' : 'Search city and select station'}
+              label={this.props.searchType == 'station' ? 
+                'Search city and select one' : 'Search city and select station'}
               onChange={this.handleUserInput}
               variant="outlined" fullWidth />
           )}
