@@ -48,29 +48,36 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default function VehicleSelects() {
+export default function VehicleSelects(props) {
     const classes = useStyles();
     const [vehicle, setVehicle] = React.useState('');
     const handleChange = event => {
         setVehicle(event.target.value);
+        let { field } = props
+        field && field.onChange({
+            target: {
+
+                name: field.name,
+                value: event.target.value
+            }
+        })
+        props.journeyGraphHandler(field.name, event.target.value, props.id)
     };
     return (
-        <div>
+        <FormControl className={classes.margin} value={vehicle}>
+            {/* <InputLabel htmlFor="demo-customized-select-native">Select Vehicle</InputLabel> */}
+            <NativeSelect
+                // id="demo-customized-select-native"
+                value={vehicle}
+                onChange={handleChange}
+                input={<BootstrapInput />}
+            >
+                <option >Select Vehicle</option>
+                <option value={'Train'}>Train</option>
+                <option value={'flight'}>Flight</option>
+                <option value={'ship'}>Ship</option>
+            </NativeSelect>
+        </FormControl>
 
-            <FormControl className={classes.margin}>
-                {/* <InputLabel htmlFor="demo-customized-select-native">Select Vehicle</InputLabel> */}
-                <NativeSelect
-                    // id="demo-customized-select-native"
-                    value={vehicle}
-                    onChange={handleChange}
-                    input={<BootstrapInput />}
-                >
-                    <option >Select Vehicle</option>
-                    <option value={'Train'}>Train</option>
-                    <option value={'flight'}>Flight</option>
-                    <option value={'ship'}>Ship</option>
-                </NativeSelect>
-            </FormControl>
-        </div >
     );
 }

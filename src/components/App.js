@@ -59,8 +59,8 @@ class App extends Component {
   };
 
   //Store data for the node to be added
-  handleChangingState = (nodeName,node) => {
-    this.setState({node, nodeName, add: 1})
+  handleChangingState = (nodeName, node) => {
+    this.setState({ node, nodeName, add: 1 })
   }
 
   render() {
@@ -68,15 +68,25 @@ class App extends Component {
       <ApolloProvider client={client}>
         {/* <Router> */}
         <div>
+<<<<<<< Updated upstream
           <h1>Welcome to My React App!!</h1>
           {/* <Popup handleChangingState={this.handleChangingState}/> */}
           <Search searchType='station' />
           {/* <SearchResult searchType='station'/> */}
           {/* <SearchResult/> */}
+=======
+          {/* <h1>Welcome to My React App!!</h1> */}
+          {/* <Popup handleChangingState={this.handleChangingState} /> */}
+          {/* <Search /> */}
+>>>>>>> Stashed changes
           {/* <Route exact path="/" component={Search} /> */}
 
+          <JourneyApp handleChangingState={this.handleChangingState} />
           {/* **Testing subscription component**
+<<<<<<< Updated upstream
           <JourneyApp />
+=======
+>>>>>>> Stashed changes
           {/* <Popup /> */}
         </div>
         <JourneyApp />
@@ -123,14 +133,22 @@ class App extends Component {
           >
             Delete
           </button>*/}
+<<<<<<< Updated upstream
           <Subscription
             that={this}
             state={this.state}
             handleStateReset={this.handleStateReset}
           />
         {/* </div>  */}
+=======
+        <Subscription
+          that={this}
+          state={this.state}
+          handleStateReset={this.handleStateReset}
+        />
+>>>>>>> Stashed changes
         {/* </Router> */}
-      </ApolloProvider>
+      </ApolloProvider >
     );
   }
 }

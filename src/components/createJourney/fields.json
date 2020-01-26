@@ -1,13 +1,22 @@
 {
     "date": {
-        "type": "HandleDateTime",
-        "name": "date",
+        "type": "DateofDestination",
+        "name": "arrivalDate",
+        "placeholder": "Pick Your Date",
+        "id": "arrivalDate",
+        "validations": {}
+    },
+    "sourcedate": {
+        "type": "DateofSource",
+        "name": "launchDate",
+        "id": "launchDate",
         "placeholder": "Pick Your Date",
         "validations": {}
     },
     "selectVehicle": {
         "type": "VehicleSelects",
         "name": "select",
+        "id": "select",
         "placeholder": "selectVehicle",
         "validations": {}
     }
