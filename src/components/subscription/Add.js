@@ -30,8 +30,10 @@ const handleAdd = (that, node, client) => {
 		mutation: QUERY
 	})
 		.then(result => {
+			console.log(node)
 			//Create relation ships for the node
 			map(node.relations, async (relation) => {
+				console.log("node2ID")
 				let node2ID = relation.with
 				//First, check if there's another node need to be created before creating relation
 				if (relation.node) {

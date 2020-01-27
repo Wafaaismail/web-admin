@@ -38,35 +38,33 @@ const useStyles = makeStyles(theme => ({
 
 
 
+
 export default function Popup(props) {
-  const handlePopUp = props.handlePopUp
+  // const handlePopUp = props.handlePopUp
   
   console.log(props)
   let node = {
     node: {
       name: "station",
       props: {},
-      relations: [{ type: "EXISTS_IN", with: "123" }]
+      relations: {1:{ type: "EXISTS_IN", with: "52873785-cfc9-4007-a04f-6e608c66b7ef" }}
     }
   };
   const handleChangingState = (stationName) => {
     node.node.props = { name: stationName }
     props.handleChangingState("station", node,props.action)
-    // console.log(node)
+    console.log(node)
   }
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [modalStyle] = React.useState(getModalStyle);
-  const [open, setOpen] = React.useState(false);
-
-  const handleOpen = () => {
-    console.log('handleopen',handlePopUp)
-    setOpen(handlePopUp);
-  };
+  // const [open, setOpen] = React.useState(false);
+  const open = props.handlePopUp
   const handleClose = () => {
-    setOpen(false);
+    props.toggle()
   };
-
+  
+  
 
   return (
     
@@ -89,7 +87,7 @@ export default function Popup(props) {
             initialValues={{ addStation: "test" }}
 
             onSubmit={values => {
-              console.log(values)
+              console.log('values',values)
               handleChangingState(values.addStation)
             }}
 

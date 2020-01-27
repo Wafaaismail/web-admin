@@ -9,9 +9,12 @@ import Popup from './popup-add'
 
 class SearchResult extends Component {
     state = {
-    handlePopUp : false,
-    handleAction: ''
-}
+        handlePopUp : false,
+        handleAction: ''
+    }
+    toggle = ()=>{
+        this.setState({handlePopUp : false})
+    }
     deleteChioce = () => {
         const choice = document.querySelector('input[name="choice"]:checked').value
         const QUERY = gql`mutation {
@@ -40,11 +43,11 @@ class SearchResult extends Component {
                     ))
                 }</ul>
                 <div>
-                    <Button variant="contained" color="secondary" onClick={()=> {this.setState({handlePopUp : true, handleAction :'ADD'}); console.log('ss',this.handlePopUp,this.handleAction)}}>Add</Button>
-                    <Button variant="contained" color="secondary"onClick={()=> {this.setState({handlePopUp : true, handleAction :'UPDATE'})}}>Edit</Button>
+                    <Button variant="contained" color="secondary" onClick={()=> {this.setState({handlePopUp : true, handleAction :'add'}); console.log('ss',this.handlePopUp,this.handleAction)}}>Add</Button>
+                    <Button variant="contained" color="secondary"onClick={()=> {this.setState({handlePopUp : true, handleAction :'update'})}}>Edit</Button>
                     <Button variant="contained" color="secondary" 
                         onClick={this.deleteChioce}>Delete</Button>
-                    <Popup handlePopUp={this.state.handlePopUp} action={this.state.handleAction}/>
+                    <Popup  handleChangingState={this.props.handleChangingState} handlePopUp={this.state.handlePopUp} action={this.state.handleAction} toggle={this.toggle}/>
                 </div>
             </>
         )
