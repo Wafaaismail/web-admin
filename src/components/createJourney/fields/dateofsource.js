@@ -1,25 +1,32 @@
 import 'date-fns';
 import React from 'react';
+import { get } from 'lodash'
 import DateFnsUtils from '@date-io/date-fns';
 import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
-
-export default function HandleDateTime() {
+import moment from 'moment'
+export default function DateofSource(props) {
     // The first commit of Material-UI
     const [selectedSourceDate, setSelectedSourceDate] = React.useState(new Date());
-    const [selectedDestinationDate, setSelectedDestinationDate] = React.useState(new Date());
 
 
     const handleSourceDateChange = date => {
         setSelectedSourceDate(date);
-    };
-    const handleDestinationDateChange = date => {
-        setSelectedDestinationDate(date);
-    };
+        let { field } = props
+        // console.log(date)
+        field && field.onChange({
+            target: {
 
+                name: field.name,
+                value: moment(date).format("MM-DD-YYYY")
+            }
+        })
+        props.journeyGraphHandler(field.name, moment(date).format("MM-DD-YYYY"), props.id)
+    };
+    // console.log(props)
     return (
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
 
@@ -30,17 +37,6 @@ export default function HandleDateTime() {
                 format="MM/dd/yyyy"
                 value={selectedSourceDate}
                 onChange={handleSourceDateChange}
-                KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                }}
-            />
-            <KeyboardDatePicker
-                // margin="normal"
-                id="date-picker-destination"
-                label="Date picker destination"
-                format="MM/dd/yyyy"
-                value={selectedDestinationDate}
-                onChange={handleDestinationDateChange}
                 KeyboardButtonProps={{
                     'aria-label': 'change date',
                 }}

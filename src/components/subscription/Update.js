@@ -1,9 +1,14 @@
 import React, { Component } from "react";
 import { gun } from "./initGun";
-import resolvers from "../../../../server/db_utils/schema/resolvers";
+import gql from 'graphql-tag';
+
+const stringifyArgs = (args) => {
+  // delete args.nodelabel
+  return '{' + map(args, (d, key) => `${key}: ${JSON.stringify(d)}`).join(', ') + '}';
+};
 
 //Handling update action
-const handleUpdate = (that, nodeName, nodeId, props) => {
+const handleUpdate = (that, nodeName, nodeId, props, client) => {
   const data = { ...props };
 
   //First check if the node actually exists to be updated
@@ -24,7 +29,19 @@ const handleUpdate = (that, nodeName, nodeId, props) => {
         // });
 
         //Update node props in graph
-        resolvers.Mutation.updateNode({}, { nodeId, nodeArgs: data });
+        // resolvers.Mutation.updateNode({}, { nodeId, nodeArgs: data });
+        let QUERY = gql`mutation {
+          updateNode(nodeId: "${nodeId}", nodeArgs: ${stringifyArgs(...data)})
+        }`
+        client.mutate({
+          mutation: QUERY
+        })
+          .then(result => {
+            console.log(result)
+          })
+          .catch(err => {
+            console.log(err)
+          })
       }
     });
 };
@@ -38,7 +55,8 @@ export default class Update extends Component {
         nextProps.that,
         nextProps.state.nodeName,
         nextProps.state.nodeId,
-        nextProps.state.props
+        nextProps.state.props,
+        nextProps.client
       );
       //Return update flag to 0 and empty props and nodeId
       nextProps.handleStateReset("update");

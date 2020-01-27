@@ -34,12 +34,16 @@ export default function JourneyMutation(props) {
     const handleDestinationStationChange = station => {
         setSelectedDestinationStation(station);
     };
-    console.log(props)
+    // console.log(props)
 
-    const onFormSubmit = (values) => {
-        console.log('Submitted Values: ', values)
+    // const onFormSubmit = (values) => {
+    //     console.log('Submitted Values: ', values)
+    // }
+
+    const journeyGraphHandler = (values) => {
+
+        props.journeyGraphHandler(values, props.id)
     }
-
 
     return (
         <>
@@ -49,15 +53,16 @@ export default function JourneyMutation(props) {
             </ButtonGroup>
             <Formik
                 initialValues={{
-                    date: '',
-                    selectVehicle: '',
-                    title: ''
+                    arrivalDate: '',
+                    launchDate: '',
+                    select: '',
                 }}
-                onSubmit={onFormSubmit}
+            // onChange={journeyGraphHandler}
+            // onSubmit={onFormSubmit}
             >
                 {/* Form rendering function */}
                 {(FormikProps) => {
-                    console.log('FormikProps', FormikProps)
+                    // console.log('FormikProps', FormikProps)
                     return (
                         <>
 
@@ -67,7 +72,9 @@ export default function JourneyMutation(props) {
                                     //map fields component dynamically from json file using middle component
                                     map(fieldsJSON.default, (value, index) => {
                                         return <RenderComponent key={index}
-                                            value={{ ...value }}
+                                            id={props.id}
+                                            fieldSettings={{ ...fieldSettings }}
+                                            journeyGraphHandler={props.journeyGraphHandler}
                                         />
                                     })
                                 }

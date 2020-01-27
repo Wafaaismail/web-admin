@@ -68,13 +68,14 @@ class App extends Component {
       <ApolloProvider client={client}>
         {/* <Router> */}
         <div>
-          {/* <h1>Welcome to My React App!!</h1> */}
           {/* <Popup handleChangingState={this.handleChangingState}/> */}
           <Search searchType='station' handleChangingState={this.handleChangingState}/>
           {/* <SearchResult searchType='station'/> */}
-          {/* <SearchResult/> */}
-          {/* <Route exact path="/" component={Search} /> */}
 
+          {/* <Popup handleChangingState={this.handleChangingState} /> */}
+          {/* <Search /> */}
+
+          {/* <JourneyApp handleChangingState={this.handleChangingState} /> */}
           {/* **Testing subscription component**
           <JourneyApp />
           {/* <Popup /> */}
@@ -129,8 +130,9 @@ class App extends Component {
             handleStateReset={this.handleStateReset}
           />
         {/* </div>  */}
+
         {/* </Router> */}
-      </ApolloProvider>
+      </ApolloProvider >
     );
   }
 }

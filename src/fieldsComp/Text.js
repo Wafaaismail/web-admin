@@ -1,12 +1,11 @@
-import React,{Component} from 'react'
-export class Text extends Component{
-    handleChange =(value)=>{
-        const {field}=this.props
+import React, { Component } from 'react'
+export class Text extends Component {
+    handleChange = (value) => {
+        const { field } = this.props
         field.onChange({
-            target:{
+            target: {
                 name: field.name,
                 value: value.target.value
-
             }
         })
 
