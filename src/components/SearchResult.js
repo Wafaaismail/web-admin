@@ -5,11 +5,13 @@ import { withApollo } from 'react-apollo';
 import gql from 'graphql-tag';
 import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { map } from 'lodash'
-
+import Popup from './popup-add'
 
 class SearchResult extends Component {
-
-    
+    state = {
+    handlePopUp : false,
+    handleAction: ''
+}
     deleteChioce = () => {
         const choice = document.querySelector('input[name="choice"]:checked').value
         const QUERY = gql`mutation {
@@ -21,14 +23,12 @@ class SearchResult extends Component {
         })
         .then( ()=> {
             this.props.erase(`${this.props.searchType}_data`, choice)
-            console.log(this.props.reduxState)
             console.log('node deleted successflly ')
     
         })
         .catch(error => console.error(error));
     }
     render() {
-        console.log('tetetetst,', this.props.data)
         return (
             <>
                 <ul>{
@@ -40,10 +40,11 @@ class SearchResult extends Component {
                     ))
                 }</ul>
                 <div>
-                    <Button variant="contained" color="secondary">Add</Button>
-                    <Button variant="contained" color="secondary">Edit</Button>
+                    <Button variant="contained" color="secondary" onClick={()=> {this.setState({handlePopUp : true, handleAction :'ADD'}); console.log('ss',this.handlePopUp,this.handleAction)}}>Add</Button>
+                    <Button variant="contained" color="secondary"onClick={()=> {this.setState({handlePopUp : true, handleAction :'UPDATE'})}}>Edit</Button>
                     <Button variant="contained" color="secondary" 
                         onClick={this.deleteChioce}>Delete</Button>
+                    <Popup handlePopUp={this.state.handlePopUp} action={this.state.handleAction}/>
                 </div>
             </>
         )
@@ -53,7 +54,6 @@ class SearchResult extends Component {
 // get data from redux
 const mapStateToProps = state => {
     return {
-        ...console.log('staat in componete', state),
       reduxState: state
     };
   };

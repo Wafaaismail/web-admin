@@ -59,8 +59,8 @@ class App extends Component {
   };
 
   //Store data for the node to be added
-  handleChangingState = (nodeName,node) => {
-    this.setState({node, nodeName, add: 1})
+  handleChangingState = (nodeName,node,action) => {
+    this.setState({node, nodeName, [action]: 1})
   }
 
   render() {
@@ -70,7 +70,7 @@ class App extends Component {
         <div>
           {/* <h1>Welcome to My React App!!</h1> */}
           {/* <Popup handleChangingState={this.handleChangingState}/> */}
-          <Search searchType='station' />
+          <Search searchType='station' handleChangingState={this.handleChangingState}/>
           {/* <SearchResult searchType='station'/> */}
           {/* <SearchResult/> */}
           {/* <Route exact path="/" component={Search} /> */}

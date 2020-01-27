@@ -25,7 +25,6 @@ const querySearchOptions = (partialCityName) => {
     )
   }
   `
-  // console.log('QUERY', QUERY)
   return gql(QUERY)
 }
 
@@ -99,14 +98,12 @@ class Search extends Component {
       query: querySignature(input)
     })
     .then(results => {
-      console.log('QUERY RESULTS FROM SERVER: ', results)
       this.props.multiDispatchQueryResults(results.data.normalizedSearch)
     })
     .catch(error => console.error(error));
   }
 
   handleOptionSelected = (event, option) => {
-    // console.log('Option: ', option.cityId)
 
     // get relations between our city and its stations 
     const targetRelations = apply({
@@ -141,7 +138,6 @@ class Search extends Component {
     if (searchTerm) {
       // set new timer
       this.myTimer = setTimeout(() => {
-        console.log('searchTerm: ', searchTerm)
         // apply filter on redux
         const optionsFromRedux = this.filterReduxForOptions(searchTerm)
         if (optionsFromRedux.length !== 0) {
@@ -155,7 +151,6 @@ class Search extends Component {
   }
 
   render() {
-    console.log('in search', this.state.cityStations,'redux', this.props.reduxState)
     return (
       <>
         <Autocomplete
@@ -174,8 +169,7 @@ class Search extends Component {
               variant="outlined" fullWidth />
           )}
         />
-        {console.log('inside search')}
-        <SearchResult searchType={this.props.searchType} data={this.state.cityStations}/>
+        <SearchResult searchType={this.props.searchType} data={this.state.cityStations } handleChangingState={this.props.handleChangingState}/>
       </>
     )
   }
