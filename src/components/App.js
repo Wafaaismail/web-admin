@@ -3,15 +3,15 @@ import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { connect } from "react-redux";
 import Subscription from "./subscription/index";
 import Search from "./Search";
-import ApolloClient from 'apollo-boost';
-import { ApolloProvider } from 'react-apollo';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Popup from './popup-add'
-import PopupEdit from './popup-edit'
+import ApolloClient from "apollo-boost";
+import { ApolloProvider } from "react-apollo";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import Popup from "./popup-add";
+import PopupEdit from "./popup-edit";
 // import SearchStations from "./searchStations";
 // import Popup from './popup-stations'
 import SearchResult from "./SearchResult";
-import JourneyApp from './createJourney/journeyApp'
+import JourneyApp from "./createJourney/journeyApp";
 const client = new ApolloClient({
   uri: "http://localhost:3030/graphql"
 });
@@ -59,9 +59,9 @@ class App extends Component {
   };
 
   //Store data for the node to be added
-  handleChangingState = (nodeName,node,action) => {
-    this.setState({node, nodeName, [action]: 1})
-  }
+  handleChangingState = (nodeName, node = {}, action, nodeId = "") => {
+    this.setState({ node, nodeName, [action]: 1, nodeId });
+  };
 
   render() {
     return (
@@ -69,7 +69,10 @@ class App extends Component {
         {/* <Router> */}
         <div>
           {/* <Popup handleChangingState={this.handleChangingState}/> */}
-          <Search searchType='station' handleChangingState={this.handleChangingState}/>
+          <Search
+            searchType="station"
+            handleChangingState={this.handleChangingState}
+          />
           {/* <SearchResult searchType='station'/> */}
 
           {/* <Popup handleChangingState={this.handleChangingState} /> */}
@@ -88,51 +91,15 @@ class App extends Component {
         {/* <Search/> */}
         {/* <Route exact path="/" component={Search} /> */}
 
-        {/* **Testing subscription component**
-          <button
-            onClick={() => {
-              this.setState({ add: 1, node: stationGraph.node });
-            }}
-          >
-            Add Station
-          </button>
-          <button
-            onClick={() => {
-              this.setState({ add: 1, node: journeyGraph.node });
-            }}
-          >
-            Add Journey
-          </button>
-          <button
-            onClick={() => {
-              this.setState({
-                update: 1,
-                props: { start: "", end: "" },
-                nodeId: "27aa350d-9894-4fe3-9465-0fcd2fafe9df"
-              });
-            }}
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => {
-              this.setState({
-                delete: 1,
-                nodeId: "27aa350d-9894-4fe3-9465-0fcd2fafe9df"
-              });
-            }}
-          >
-            Delete
-          </button>*/}
-          <Subscription
-            that={this}
-            state={this.state}
-            handleStateReset={this.handleStateReset}
-          />
+        <Subscription
+          that={this}
+          state={this.state}
+          handleStateReset={this.handleStateReset}
+        />
         {/* </div>  */}
 
         {/* </Router> */}
-      </ApolloProvider >
+      </ApolloProvider>
     );
   }
 }

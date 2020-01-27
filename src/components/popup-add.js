@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
-import { makeStyles } from '@material-ui/core/styles';
-import Modal from '@material-ui/core/Modal';
+import React, { Component } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import Modal from "@material-ui/core/Modal";
 import * as FieldJSON from "../fieldsM";
 import * as Comp from "../fieldsComp";
-import { get, map, omit } from 'lodash'
-import { Formik, Field, Form } from 'formik'
-import { TextField, Button } from '@material-ui/core';
-import MiddleComponent from './MiddleComponent'
+import { get, map, omit } from "lodash";
+import { Formik, Field, Form } from "formik";
+import { TextField, Button } from "@material-ui/core";
+import MiddleComponent from "./MiddleComponent";
 
 function rand() {
   return Math.round(Math.random() * 20) - 10;
@@ -19,55 +19,49 @@ function getModalStyle() {
   return {
     top: `${top}%`,
     left: `${left}%`,
-    transform: `translate(-${top}%, -${left}%)`,
+    transform: `translate(-${top}%, -${left}%)`
   };
 }
 
 const useStyles = makeStyles(theme => ({
   paper: {
-    position: 'absolute',
+    position: "absolute",
     width: 400,
     backgroundColor: theme.palette.background.paper,
-    border: '2px solid #000',
+    border: "2px solid #000",
     boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-  },
+    padding: theme.spacing(2, 4, 3)
+  }
 }));
-
-
-
-
-
 
 export default function Popup(props) {
   // const handlePopUp = props.handlePopUp
-  
-  console.log(props)
+
+  console.log(props);
   let node = {
     node: {
       name: "station",
       props: {},
-      relations: {1:{ type: "EXISTS_IN", with: "52873785-cfc9-4007-a04f-6e608c66b7ef" }}
+      relations: {
+        1: { type: "EXISTS_IN", with: "52873785-cfc9-4007-a04f-6e608c66b7ef" }
+      }
     }
   };
-  const handleChangingState = (stationName) => {
-    node.node.props = { name: stationName }
-    props.handleChangingState("station", node,props.action)
-    console.log(node)
-  }
+  const handleChangingState = stationName => {
+    node.node.props = { name: stationName };
+    props.handleChangingState("station", node, props.action, props.id);
+    console.log(node);
+  };
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [modalStyle] = React.useState(getModalStyle);
   // const [open, setOpen] = React.useState(false);
-  const open = props.handlePopUp
+  const open = props.handlePopUp;
   const handleClose = () => {
-    props.toggle()
+    props.toggle();
   };
-  
-  
 
   return (
-    
     <div>
       {/* <button type="button" onClick={handleOpen}> */}
       {/* <Button variant="contained" color="secondary" onClick={handleOpen}> Add New</Button> */}
@@ -83,51 +77,52 @@ export default function Popup(props) {
         <div style={modalStyle} className={classes.paper}>
           <h2 id="simple-modal-title">Stations</h2>
           <Formik
-
             initialValues={{ addStation: "test" }}
-
             onSubmit={values => {
-              console.log('values',values)
-              handleChangingState(values.addStation)
+              console.log("values", values);
+              handleChangingState(values.addStation);
             }}
-
           >
-            {(FormikProps) => {
+            {FormikProps => {
               // console.log('FormikProps', FormikProps)
               return (
                 <>
-                  <Form >
-
-                    {
-                      map(omit(FieldJSON.default, ["select"]), (value, key) => {
-                        return <MiddleComponent key={key} value={{ ...value }} />
-                      })
-
-                    }
-                    <Button variant="contained" color="secondary" type="submit"   >{props.action}</Button>
-                    <Button variant="contained" color="secondary" type="submit" onClick={handleClose}>
+                  <Form>
+                    {map(omit(FieldJSON.default, ["select"]), (value, key) => {
+                      return <MiddleComponent key={key} value={{ ...value }} />;
+                    })}
+                    <Button variant="contained" color="secondary" type="submit">
+                      {props.action}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      type="submit"
+                      onClick={handleClose}
+                    >
                       close
-                </Button>
-
+                    </Button>
                   </Form>
-
                 </>
-              )
+              );
 
-
-
-              {/* <Form>
+              {
+                /* <Form>
                     <Field type="Text" id="addStation" name="addStation" placeholder="station name"  />
-                    {/* <TextField id="filled-basic" label="Filled" variant="filled" /> */}
+                    {/* <TextField id="filled-basic" label="Filled" variant="filled" /> */
+              }
 
-              {/* <button key="submit" htmlType="submit" type="primary" onClick={(values)=>{
+              {
+                /* <button key="submit" htmlType="submit" type="primary" onClick={(values)=>{
                       console.log(values)
                       handleChangingState(values)}}>
                 Add
-            </button> */}
-              {/* </Form>  */ }
+            </button> */
+              }
+              {
+                /* </Form>  */
+              }
             }}
-
           </Formik>
           {/* <Formik
       initialValues={{ addStation: '' }}
