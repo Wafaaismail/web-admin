@@ -5,7 +5,7 @@ import { gun } from '../components/subscription/initGun'
 // reducers names
 const reducerNames = [
   'station', 'journey', 'trip',
-  'city_data', 'station_data', 'country_data', 'relations_data']
+  'city_data', 'station_data', 'country_data', 'relations_data','trip_data','journey_data']
 
 // general action handlers: common logic to be executed when an action is dispatched
 const generalActionHandlers = {

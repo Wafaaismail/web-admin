@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 export default function Popup(props) {
   // const handlePopUp = props.handlePopUp
   
-  console.log(props)
+  // console.log(props)
   let node = {
     node: {
       name: "station",

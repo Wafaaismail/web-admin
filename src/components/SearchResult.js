@@ -44,7 +44,7 @@ class SearchResult extends Component {
                 }</ul>
                 <div>
                     <Button variant="contained" color="secondary" onClick={()=> {this.setState({handlePopUp : true, handleAction :'add'}); console.log('ss',this.handlePopUp,this.handleAction)}}>Add</Button>
-                    <Button variant="contained" color="secondary"onClick={()=> {this.setState({handlePopUp : true, handleAction :'update'})}}>Edit</Button>
+                    <Button variant="contained" color="secondary"onClick={()=> {this.setState({handlePopUp : true, handleAction :'edit'})}}>Edit</Button>
                     <Button variant="contained" color="secondary" 
                         onClick={this.deleteChioce}>Delete</Button>
                     <Popup  handleChangingState={this.props.handleChangingState} handlePopUp={this.state.handlePopUp} action={this.state.handleAction} toggle={this.toggle}/>

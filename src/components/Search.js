@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { withApollo } from 'react-apollo';
 // import {gun} from './subscription/initGun'
 import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
-import { map, flattenDeep, filter,get } from 'lodash'
+import { map, flattenDeep, filter, get, reduce, assign } from 'lodash'
 import { apply } from '../helpers/apply_function/apply'
 import SearchResult from './SearchResult';
 
@@ -28,10 +28,88 @@ const querySearchOptions = (partialCityName) => {
   return gql(QUERY)
 }
 
+const queryTripsByStation = (stationId) => {
+  const QUERY = `
+    {
+      normalizedSearch(
+        settings: {
+          searchNode: "station"
+          matchByExactProps: {id: "${stationId}"}
+          searchReturn: "self, relative1"
+          relative1: "trip"
+        }  
+      )
+    }
+  `
+  return gql(QUERY)
+}
+
+const queryJourenysByTrip =(tripId)=>{
+  const QUERY =`
+    {
+      normalizedSearch(
+        settings: {
+          searchNode: "trip"
+          matchByExactProps: {id: "${tripId}"}
+          searchReturn: "self, relative1"
+          relative1: "journey"
+        }  
+      )
+    }
+  `
+  return gql(QUERY)
+}
+
+const queryTripsByJourney =(journeyId)=>{
+  const QUERY =`
+    {
+      normalizedSearch(
+        settings: {
+          searchNode: "journey"
+          matchByExactProps: {id: "${journeyId}"}
+          searchReturn: "self, relative1"
+          relative1: "trip"
+        }  
+      )
+    }
+  `
+  return gql(QUERY)
+}
+
+const queryStationsByTrip =(tripId)=>{
+  const QUERY =`
+    {
+      normalizedSearch(
+        settings: {
+          searchNode: "trip"
+          matchByExactProps: {id: "${tripId}"}
+          searchReturn: "self, relative1"
+          relative1: "station"
+        }  
+      )
+    }
+  `
+  return gql(QUERY)
+}
+
+
 class Search extends Component {
   constructor(props) {
     super(props)
     this.state = {}
+  }
+
+  executeQuery = async (querySignature, input) => {
+    const queryResults = await this.props.client.query({
+      query: querySignature(input)
+    })
+    .then(results => {
+      this.props.multiDispatchQueryResults(results.data.normalizedSearch)
+      return results.data.normalizedSearch
+    })
+    .catch(error => console.error(error))
+    // console.log('queryResults', queryResults)
+    return queryResults
   }
 
   filterReduxForOptions = (searchTerm) => {
@@ -75,56 +153,80 @@ class Search extends Component {
           }
         })
         // get station objs
-        const stationObjs = map(stationRelations, relation => 
-          apply({
-            funcName: 'filterByExactProps',
-            pathInState: 'station_data',
-            params: { exactProps: {id: relation.stationId} },
-          })[0]
+        const stationObjs = map(stationRelations, relation =>
+          reduxState.station_data[relation.stationId]
         )
         // create and add options
         map(stationObjs, stationObj => {
-          finalOptions.push({...option, stationName: stationObj.name})
+          finalOptions.push({ ...option, stationName: stationObj.name ,stationId: stationObj.id })
         })
       } else { finalOptions.push(option) }
     })
 
-    console.log('options: ', finalOptions)
+    // console.log('options: ', finalOptions)
     return finalOptions
   }
+  
+  dataForJourneysChoices = async (stationId) => {
+    /*** FROM STATION TO JOURNEYS (UP) ***/
+    // get related trips: query, dispatch in redux, return
+    const tripsRelatedToStatoin = (await this.executeQuery(queryTripsByStation, stationId)).trip_data
+    // console.log('tripsRelatedToStatoin', tripsRelatedToStatoin)
+    // get related journeys: query, dispatch in redux, return
+    const journeysRelatedToStatoin = await reduce(tripsRelatedToStatoin, async (result, tripObj, tripId) => {
+      const journeysRelatedToTrip = (await this.executeQuery(queryJourenysByTrip, tripId)).journey_data
+      result = await result // wait for result promise to resolve to an object
+      return assign(result, journeysRelatedToTrip)
+    }, {})
+    // console.log('journeysRelatedToStatoin', journeysRelatedToStatoin)
+    // console.log('LENGTH', Object.keys(journeysRelatedToStatoin).length)
 
-  executeQuery = (querySignature, input) => {
-    this.props.client.query({
-      query: querySignature(input)
-    })
-    .then(results => {
-      this.props.multiDispatchQueryResults(results.data.normalizedSearch)
-    })
-    .catch(error => console.error(error));
+    /*** FROM JOURNEYS TO STATIONS (DOWN) ***/
+    const completeJournieseData = await Promise.all(
+      map(journeysRelatedToStatoin, async (journeyObj, journeyId) => {
+        // get related trips: query, dispatch in redux, return
+        const tripsRelatedToJourney = (await this.executeQuery(queryTripsByJourney, journeyId)).trip_data
+        // console.log('tripsRelatedToJourney', tripsRelatedToJourney)
+        // get related stations: query, dispatch in redux, return
+        const stationsRelatedToJourney = await reduce(tripsRelatedToJourney, async (result, tripObj, tripId) => {
+          const stationsRelatedToTrip = (await this.executeQuery(queryStationsByTrip, tripId)).station_data
+          result = await result // wait for result promise to resolve to an object
+          // console.log('stationsRelatedToTrip', stationsRelatedToTrip)
+          // console.log('result', result)
+          return assign(result, stationsRelatedToTrip)
+        }, {})
+        // console.log('stationsRelatedToJourney', stationsRelatedToJourney)
+        return {journey: journeyObj, tripsRelatedToJourney, stationsRelatedToJourney}
+      })
+    )
+    console.log('completeJournieseData', completeJournieseData)
+    return completeJournieseData // dont return here, set it in local state and pass it to searchResult
   }
 
-  handleOptionSelected = (event, option) => {
-
+  dataForStationsChoices = (cityId) => {
     // get relations between our city and its stations 
     const targetRelations = apply({
       funcName: 'filterByExactProps',
       pathInState: 'relations_data',
-      params: { exactProps: {cityId: option.cityId} },
+      params: { exactProps: { cityId } },
       then: {
         funcName: 'filterByKeyExists',
         params: { key: 'stationId' }
       }
     })
     // get stations of the city
-    const cityStations = map(targetRelations, relation => 
-        apply({
-          funcName: 'filterByExactProps',
-          pathInState: 'station_data',
-          params: { exactProps: {id: relation.stationId} },
-        })[0]
+    const cityStations = map(targetRelations, relation =>
+      this.props.reduxState.station_data[relation.stationId]
     )
-    
-    this.setState({cityStations})
+    this.setState({ cityStations })
+  }
+
+  handleOptionSelected = (event, option) => {
+    option?
+    (this.props.searchType === 'journey'?
+        this.dataForJourneysChoices(option.stationId):
+        this.dataForStationsChoices(option.cityId)
+    ): console.log('No option is selected')
   }
 
   myTimer = ''
@@ -163,13 +265,13 @@ class Search extends Component {
           onChange={this.handleOptionSelected}
           renderInput={params => (
             <TextField {...params}
-              label={this.props.searchType == 'station' ? 
+              label={this.props.searchType == 'station' ?
                 'Search city and select one' : 'Search city and select station'}
               onChange={this.handleUserInput}
               variant="outlined" fullWidth />
           )}
         />
-        <SearchResult searchType={this.props.searchType} data={this.state.cityStations } handleChangingState={this.props.handleChangingState}/>
+        <SearchResult searchType={this.props.searchType} data={this.state.cityStations} handleChangingState={this.props.handleChangingState} />
       </>
     )
   }

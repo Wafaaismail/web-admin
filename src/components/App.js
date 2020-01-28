@@ -69,7 +69,7 @@ class App extends Component {
         {/* <Router> */}
         <div>
           {/* <Popup handleChangingState={this.handleChangingState}/> */}
-          <Search searchType='station' handleChangingState={this.handleChangingState}/>
+          <Search searchType='journey' handleChangingState={this.handleChangingState}/>
           {/* <SearchResult searchType='station'/> */}
 
           {/* <Popup handleChangingState={this.handleChangingState} /> */}
