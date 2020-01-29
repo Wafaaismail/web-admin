@@ -4,7 +4,7 @@ import App from './components/App'
 import allReducers from './reducers'
 import { createStore, compose } from 'redux'
 import { Provider } from 'react-redux'
-import { reduxBatch } from '@manaflair/redux-batch'
+import Login from './components/forms/login'
 
 // initialize store, activate Redux devtools
 export const store = createStore(
@@ -24,6 +24,7 @@ export const store = createStore(
 // })
 
 // connect React app with Redux and render
+
 ReactDOM.render(
   <Provider store={store}> <App /> </Provider>,
   document.getElementById('app')

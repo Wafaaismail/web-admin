@@ -1,0 +1,18 @@
+{
+  "username": {
+    "type": "Text",
+    "name": "username",
+    "id":"username",
+    "placeholder": "Username",
+    "validations": {}
+  },
+  "password": {
+    "type": "Text",
+    "name": "password",
+    "id":"password",
+    "placeholder": "write ur password",
+    "validations": {},
+    "filedtype":"password"
+  }
+}
+
