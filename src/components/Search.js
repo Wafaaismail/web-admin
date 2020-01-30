@@ -9,6 +9,7 @@ import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { map, filter, get, reduce, assign, flatten } from 'lodash'
 import { apply } from '../helpers/apply_function/apply'
 import SearchResult from './SearchResult';
+import Journey from './createJourney/journeyApp'
 // query generators
 const querySearchOptions = (partialCityName) => {
   const QUERY = `
@@ -43,8 +44,8 @@ const queryTripsByStation = (stationId) => {
   return gql(QUERY)
 }
 
-const queryJourenysByTrip =(tripId)=>{
-  const QUERY =`
+const queryJourenysByTrip = (tripId) => {
+  const QUERY = `
     {
       normalizedSearch(
         settings: {
@@ -59,8 +60,8 @@ const queryJourenysByTrip =(tripId)=>{
   return gql(QUERY)
 }
 
-const queryTripsByJourney =(journeyId)=>{
-  const QUERY =`
+const queryTripsByJourney = (journeyId) => {
+  const QUERY = `
     {
       normalizedSearch(
         settings: {
@@ -75,8 +76,8 @@ const queryTripsByJourney =(journeyId)=>{
   return gql(QUERY)
 }
 
-const queryStationsByTrip =(tripId)=>{
-  const QUERY =`
+const queryStationsByTrip = (tripId) => {
+  const QUERY = `
     {
       normalizedSearch(
         settings: {
@@ -94,8 +95,8 @@ const queryStationsByTrip =(tripId)=>{
 const isBiggerDate = (date1, date2) => {
   // returns true whether Date1 is bigger than Date2
   // format 'YYYY/MM/DD HH:MM'
-  date1 = date1.slice(0,9)
-  date2 = date2.slice(0,9)
+  date1 = date1.slice(0, 9)
+  date2 = date2.slice(0, 9)
   return date1 > date2
 
 }
@@ -104,19 +105,20 @@ class Search extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      searchId:''
+      searchId: '',
+      controlDisplay: true
     }
   }
-
+  handleRender = () => { this.setState({ controlDisplay: !this.state.controlDisplay }) }
   executeQuery = async (querySignature, input) => {
     const queryResults = await this.props.client.query({
       query: querySignature(input)
     })
-    .then(results => {
-      this.props.multiDispatchQueryResults(results.data.normalizedSearch)
-      return results.data.normalizedSearch
-    })
-    .catch(error => console.error(error))
+      .then(results => {
+        this.props.multiDispatchQueryResults(results.data.normalizedSearch)
+        return results.data.normalizedSearch
+      })
+      .catch(error => console.error(error))
     // console.log('queryResults', queryResults)
     return queryResults
   }
@@ -167,7 +169,7 @@ class Search extends Component {
         )
         // create and add options
         map(stationObjs, stationObj => {
-          finalOptions.push({ ...option, stationName: stationObj.name ,stationId: stationObj.id })
+          finalOptions.push({ ...option, stationName: stationObj.name, stationId: stationObj.id })
         })
       } else { finalOptions.push(option) }
     })
@@ -175,12 +177,12 @@ class Search extends Component {
     // console.log('options: ', finalOptions)
     return finalOptions
   }
-  
+
   orderTripsAndStations = (trips) => {
     // get trip objects in a list
     const unorderedTrips = Object.values(trips)
     // order them according to start date
-    const orderedTrips = unorderedTrips.sort((a,b) => {
+    const orderedTrips = unorderedTrips.sort((a, b) => {
       return new Date(a.start_d) - new Date(b.start_d)
     })
     // console.log('orderd Trips', orderedTrips)
@@ -192,33 +194,33 @@ class Search extends Component {
         const filteredRelations = apply({
           funcName: 'filterByExactProps',
           pathInState: 'relations_data',
-          params: { exactProps: { tripId: trip.id}},
-          then :{
+          params: { exactProps: { tripId: trip.id } },
+          then: {
             funcName: 'filterByKeyExists',
-            params: { key: "stationId"},
+            params: { key: "stationId" },
           }
         })
         // console.log('filteredRelations', filteredRelations)
 
         // get departure station for each trip
-        const fromRelation = filter(filteredRelations, { type: 'FROM'})[0]
+        const fromRelation = filter(filteredRelations, { type: 'FROM' })[0]
         // console.log('fromRelation', fromRelation)
-        const departureStation = get(this.props.reduxState.station_data, fromRelation.stationId ,'no station')
+        const departureStation = get(this.props.reduxState.station_data, fromRelation.stationId, 'no station')
         // console.log('fromStation', fromStation)
-        
+
         // get arrival station for last trip
-        if (orderedTrips.length-1 == index){
-          const toRelation = filter(filteredRelations, { type: 'TO'})[0]
-          const arrivalStation = get(this.props.reduxState.station_data, toRelation.stationId ,'no station')
+        if (orderedTrips.length - 1 == index) {
+          const toRelation = filter(filteredRelations, { type: 'TO' })[0]
+          const arrivalStation = get(this.props.reduxState.station_data, toRelation.stationId, 'no station')
           return [departureStation, arrivalStation]
         }
         else return departureStation
       })
     )
-    return {trips: orderedTrips, stations: orderedStations}
+    return { trips: orderedTrips, stations: orderedStations }
 
   }
- 
+
   dataForJourneysChoices = async (stationId) => {
     /*** FROM STATION TO JOURNEYS (UP) ***/
     // get related trips: query, dispatch in redux, return
@@ -249,7 +251,7 @@ class Search extends Component {
         }, {})
         const orderedTripsAndStations = this.orderTripsAndStations(tripsRelatedToJourney)
         // console.log('stationsRelatedToJourney', stationsRelatedToJourney)
-        return {id: journeyId, journey: journeyObj, ...orderedTripsAndStations}
+        return { id: journeyId, journey: journeyObj, ...orderedTripsAndStations }
       })
     )
     console.log("completeJourneysData", completeJourneysData)
@@ -277,11 +279,11 @@ class Search extends Component {
   }
 
   handleOptionSelected = (event, option) => {
-    option?
-    (this.props.searchType === 'journey'?
-        (this.dataForJourneysChoices(option.stationId)):
-        (this.dataForStationsChoices(option.cityId) , this.state.searchId = option.cityId )
-    ): console.log('No option is selected')
+    option ?
+      (this.props.searchType === 'journey' ?
+        (this.dataForJourneysChoices(option.stationId)) :
+        (this.dataForStationsChoices(option.cityId), this.state.searchId = option.cityId)
+      ) : console.log('No option is selected')
   }
 
   myTimer = ''
@@ -310,28 +312,31 @@ class Search extends Component {
   render() {
     return (
       <>
-      <h1>{this.props.searchType.toUpperCase()}</h1>
-        <Autocomplete
-          options={this.state.optionsFromRedux}
-          getOptionLabel={option =>
-            option.stationName ?
-              `${option.countryName}, ${option.cityName}, ${option.stationName}` :
-              `${option.countryName}, ${option.cityName}`
-          }
-          onChange={this.handleOptionSelected}
-          renderInput={params => (
-            <TextField {...params}
-              label={this.props.searchType == 'station' ?
-                'Search city and select one' : 'Search city and select station'}
-              onChange={this.handleUserInput}
-              variant="outlined" fullWidth />
-          )}
-        />
-        <SearchResult searchType={this.props.searchType}
-         data={ this.props.searchType === 'journey' ?  this.state.completeJourneysData : this.state.cityStations}
-          handleChangingState={this.props.handleChangingState}
-          id ={this.state.searchId}
-          />
+        <h1>{this.props.searchType.toUpperCase()}</h1>
+        {!this.state.controlDisplay && <Journey handleRender={this.handleRender} handleChangingState={this.props.handleChangingState}/>}
+        {this.state.controlDisplay &&
+          <Autocomplete
+            options={this.state.optionsFromRedux}
+            getOptionLabel={option =>
+              option.stationName ?
+                `${option.countryName}, ${option.cityName}, ${option.stationName}` :
+                `${option.countryName}, ${option.cityName}`
+            }
+            onChange={this.handleOptionSelected}
+            renderInput={params => (
+              <TextField {...params}
+                label={this.props.searchType == 'station' ?
+                  'Search city and select one' : 'Search city and select station'}
+                onChange={this.handleUserInput}
+                variant="outlined" fullWidth />
+            )}
+            /> }
+          {this.state.controlDisplay && <SearchResult searchType={this.props.searchType}
+            data={this.props.searchType === 'journey' ? this.state.completeJourneysData : this.state.cityStations}
+            handleChangingState={this.props.handleChangingState}
+            id={this.state.searchId}
+            handleRender={this.handleRender}
+          />}
       </>
     )
   }

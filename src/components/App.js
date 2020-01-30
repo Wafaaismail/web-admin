@@ -28,7 +28,8 @@ class App extends Component {
 
   //Store data for the node to be added
   handleChangingState = (nodeName, node, action, nodeId, props) => {
-    // console.log('action',action)
+    console.log('action',action)
+    console.log("state",this.state)
     this.setState({ node, nodeName, [action]: 1, nodeId, props });
     // console.log("state",this.state)
   };
@@ -37,17 +38,19 @@ class App extends Component {
     return (
       <ApolloProvider client={client}>
         <div>
-          <Home/>
-          {/* <Search
-            searchType="journey"
-            handleChangingState={this.handleChangingState}
-          />
+          <Home handleChangingState={this.handleChangingState}/>
+          {/* <Search searchType='station' /> */}
 
-          <Subscription
+           {/* <Search
+            searchType="station"
+            handleChangingState={this.handleChangingState}
+          /> */}
+
+         <Subscription
             that={this}
             state={this.state}
             handleStateReset={this.handleStateReset}
-          /> */}
+          />
         </div>
       </ApolloProvider>
     );

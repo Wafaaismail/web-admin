@@ -27,7 +27,7 @@ class SearchResult extends Component {
   deleteChioce = () => {
     const choice = document.querySelector('input[name="choice"]:checked').value
     this.props.handleChangingState(this.props.searchType,{},"delete",choice,{})
-    this.setState({})
+    // this.setState({})
     // const QUERY = gql`mutation {
     //         deleteNode(nodeId:"${choice}")
     //         }
@@ -63,7 +63,7 @@ class SearchResult extends Component {
         }
         </ul>
         <div>
-          <Button variant="contained" color="secondary" onClick={() => { this.handleOptions(true,'add',this.props.id) }}>Add</Button>
+          <Button variant="contained" color="secondary" onClick={() => { this.props.searchType == 'journey'? this.props.handleRender() : this.handleOptions(true,'add',this.props.id) }}>Add</Button>
           <Button variant="contained" color="secondary" onClick={() => { this.handleOptions(true,'update','') }}>Edit</Button>
           <Button variant="contained" color="secondary"
             onClick={this.deleteChioce}>Delete</Button>

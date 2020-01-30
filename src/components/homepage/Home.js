@@ -4,7 +4,7 @@ import "./index.css";
 import { Layout, Menu, Icon } from "antd";
 import {
   BrowserRouter as Router,
-  Switch, Route, Link
+  Route, Link
 } from 'react-router-dom'
 import Search from "../Search";
 
@@ -30,30 +30,29 @@ class Home extends React.Component {
           <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
             <div className="logo" />
             <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
-            <Menu.Item key="4">
+              <Menu.Item key="4">
                 <Icon type="home" />
                 <span>
-                  <Link to='/home' style={{color:"white"}}>
-                    Home
-                </Link>
+                  Home
                 </span>
+                <Link to='/home' style={{ color: "white" }} />
               </Menu.Item>
               <Menu.Item key="2">
                 <Icon type="global" />
                 <span>
-                  <Link to='/journeys' style={{color:"white"}}>
-                    Journeys
-                </Link>
+                  Journeys
                 </span >
+                <Link to='/journeys' style={{ color: "white" }} />
               </Menu.Item>
               <Menu.Item key="1">
                 <Icon type="car" />
-                <span><Link to='/stations' style={{color:"white"}}>Stations</Link></span >
+                <span>Stations</span >
+                <Link to='/stations' style={{ color: "white" }} />
               </Menu.Item>
-              <Menu.Item key="3">
+              {/* <Menu.Item key="3">
                 <Icon type="user" />
-                <span> <Link to='/users' style={{color:"white"}}>Users</Link>  </span>
-              </Menu.Item>
+                <span> <Link to='/users' style={{ color: "white" }}>Users</Link>  </span>
+              </Menu.Item> */}
             </Menu>
           </Sider>
           <Layout>
@@ -72,22 +71,17 @@ class Home extends React.Component {
                 minHeight: 545
               }}
             >
-              <Switch>
-              {/* <Route path='/home'>
-                  <Home/>
-                </Route> */}
-                <Route path='/journeys'>
-                  <Search searchType='journey' />
-                </Route>
-                <Route path='/stations'>
-                  <Search searchType='station' />
-                </Route>
-                {/* <Route path='/users'>
+
+              <Route path='/home' render={() => (<div></div>)} />
+              <Route path='/journeys' render={() => (<Search searchType='journey' handleChangingState={this.props.handleChangingState} />)} />
+              <Route path='/stations' render={() => (<Search searchType='station' handleChangingState={this.props.handleChangingState}/>)} />
+
+              {/* <Route path='/users'>
                 <Home/>
           </Route> */}
 
-              </Switch>
-          </Content>
+
+            </Content>
           </Layout>
         </Layout>
       </Router>

@@ -3,6 +3,7 @@ import JourneyMutation from "./journeyMutation";
 import { set, map } from "lodash";
 import Button from "@material-ui/core/Button";
 import uuid from "../../helpers/uuid";
+import {Icon} from 'antd'
 
 let journeyGraph = {
   node: {
@@ -62,9 +63,10 @@ class JourneyApp extends Component {
   };
 
   render() {
-    // console.log('trips', this.state.trips)
+    console.log('journey is here')
     return (
       <>
+        {/* <Button onClick={this.props.handleRender()}><Icon type="close"></Icon></Button> */}
         <h1
           style={{
             textAlign: "center",
