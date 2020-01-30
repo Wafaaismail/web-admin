@@ -3,10 +3,8 @@ import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { connect } from "react-redux";
 import Subscription from "./subscription/index";
 import Search from "./Search";
-import ApolloClient from 'apollo-boost';
-import { ApolloProvider } from 'react-apollo';
-
-
+import ApolloClient from "apollo-boost";
+import { ApolloProvider } from "react-apollo";
 
 const client = new ApolloClient({
   uri: "http://localhost:3030/graphql"
@@ -38,13 +36,16 @@ class App extends Component {
     return (
       <ApolloProvider client={client}>
         <div>
-          <Search searchType ='journey' handleChangingState={this.handleChangingState}/>
+          <Search
+            searchType="journey"
+            handleChangingState={this.handleChangingState}
+          />
 
           <Subscription
             that={this}
             state={this.state}
             handleStateReset={this.handleStateReset}
-          /> 
+          />
         </div>
       </ApolloProvider>
     );

@@ -17,12 +17,24 @@ module.exports = {
         use: {
           loader: "babel-loader"
         }
+      },
+      { test: /\.ts$/, use: "ts-loader" },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: "style-loader" // creates style nodes from JS strings
+          },
+          {
+            loader: "css-loader" // translates CSS into CommonJS
+          }
+        ]
       }
     ]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template:"./src/index.html"
+      template: "./src/index.html"
     })
   ]
 };

@@ -8,8 +8,8 @@ const { Header, Sider, Content } = Layout;
 
 class SiderDemo extends React.Component {
   state = {
-    collapsed: false,
-    visible: false
+    collapsed: false
+    // visible: false
   };
 
   toggle = () => {
@@ -17,19 +17,18 @@ class SiderDemo extends React.Component {
       collapsed: !this.state.collapsed
     });
   };
-  hide = () => {
-    this.setState({
-      visible: false
-    });
-  };
+  // hide = () => {
+  //   this.setState({
+  //     visible: false
+  //   });
+  // };
 
-  handleVisibleChange = visible => {
-    this.setState({ visible });
-  };
+  // handleVisibleChange = visible => {
+  //   this.setState({ visible });
+  // };
   render() {
     return (
-           
-      <Layout  >
+      <Layout>
         <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
           <div className="logo" />
           <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
@@ -45,7 +44,7 @@ class SiderDemo extends React.Component {
               <Icon type="upload" />
               <span> Trips</span>
             </Menu.Item>
-            <Menu.Item key="4" title="Not clone the node">
+            {/* <Menu.Item key="4" title="Not clone the node">
               <Popover
                 content={<a onClick={this.hide}>Close</a>}
                 title="Title"
@@ -53,9 +52,9 @@ class SiderDemo extends React.Component {
                 visible={this.state.visible}
                 onVisibleChange={this.handleVisibleChange}
               >
-                {/* <Button type="primary">Click me</Button> */}
+                 <Button type="primary">Click me</Button> 
               </Popover>
-            </Menu.Item>
+            </Menu.Item> */}
           </Menu>
         </Sider>
         <Layout>
@@ -78,7 +77,6 @@ class SiderDemo extends React.Component {
           </Content>
         </Layout>
       </Layout>
-      
     );
   }
 }
