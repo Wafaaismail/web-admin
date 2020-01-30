@@ -3,6 +3,7 @@ import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { connect } from "react-redux";
 import Subscription from "./subscription/index";
 import Search from "./Search";
+import Home from './homepage/Home'
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
 
@@ -36,7 +37,8 @@ class App extends Component {
     return (
       <ApolloProvider client={client}>
         <div>
-          <Search
+          <Home/>
+          {/* <Search
             searchType="journey"
             handleChangingState={this.handleChangingState}
           />
@@ -45,7 +47,7 @@ class App extends Component {
             that={this}
             state={this.state}
             handleStateReset={this.handleStateReset}
-          />
+          /> */}
         </div>
       </ApolloProvider>
     );

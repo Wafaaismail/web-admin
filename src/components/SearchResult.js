@@ -56,9 +56,10 @@ class SearchResult extends Component {
     console.log("data from search result", this.props.data)   
     return (
       <>
+      
         <ul>
         {
-          listItems.length ? listItems : <div>Sorry, no journeys pass by this station</div>
+          listItems.length ? listItems : <div>Go on, Do Your Search </div>
         }
         </ul>
         <div>

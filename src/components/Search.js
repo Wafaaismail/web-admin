@@ -310,6 +310,7 @@ class Search extends Component {
   render() {
     return (
       <>
+      <h1>{this.props.searchType.toUpperCase()}</h1>
         <Autocomplete
           options={this.state.optionsFromRedux}
           getOptionLabel={option =>
