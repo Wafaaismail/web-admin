@@ -9,7 +9,6 @@ import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { map, filter, get, reduce, assign, flatten } from 'lodash'
 import { apply } from '../helpers/apply_function/apply'
 import SearchResult from './SearchResult';
-let data
 // query generators
 const querySearchOptions = (partialCityName) => {
   const QUERY = `
@@ -104,7 +103,9 @@ const isBiggerDate = (date1, date2) => {
 class Search extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      searchId:''
+    }
   }
 
   executeQuery = async (querySignature, input) => {
@@ -278,8 +279,8 @@ class Search extends Component {
   handleOptionSelected = (event, option) => {
     option?
     (this.props.searchType === 'journey'?
-        this.dataForJourneysChoices(option.stationId):
-        this.dataForStationsChoices(option.cityId)
+        (this.dataForJourneysChoices(option.stationId)):
+        (this.dataForStationsChoices(option.cityId) , this.state.searchId = option.cityId )
     ): console.log('No option is selected')
   }
 
@@ -327,7 +328,9 @@ class Search extends Component {
         />
         <SearchResult searchType={this.props.searchType}
          data={ this.props.searchType === 'journey' ?  this.state.completeJourneysData : this.state.cityStations}
-          handleChangingState={this.props.handleChangingState} />
+          handleChangingState={this.props.handleChangingState}
+          id ={this.state.searchId}
+          />
       </>
     )
   }

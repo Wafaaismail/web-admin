@@ -101,7 +101,7 @@ class JourneyApp extends Component {
           variant="contained"
           color="primary"
           onClick={() =>
-            this.props.handleChangingState("journey", journeyGraph, "add")
+            this.props.handleChangingState("journey", journeyGraph, "add",'',{})
           }
         >
           Save Journey

@@ -23,18 +23,20 @@ const handleAdd = (that, node, client) => {
   that.props.add(node.name, data[node1ID]);
 
   //Add new node in graph
+  let args = {id: node1ID, ...node.props}
   // resolvers.Mutation.createNode({}, { nodelabel: node.name, nodeArgs: { id: node1ID, ...node.props } });
   let QUERY = gql`mutation {
 		createNode(nodelabel: "${
       node.name
-    }", nodeArgs:{id: "${node1ID}", ${stringifyArgs(...node.props)}})
-	  }`;
+    }", nodeArgs:${stringifyArgs({...args})})
+    }`;
+    // console.log('QUERY',QUERY)
   return client
     .mutate({
       mutation: QUERY
     })
     .then(result => {
-      console.log(node);
+      console.log('inside query',node);
       //Create relation ships for the node
       map(node.relations, async relation => {
         console.log("node2ID");
@@ -68,6 +70,7 @@ const handleAdd = (that, node, client) => {
           .then(res => console.log(res))
           .catch(err => console.log(err));
       });
+      // console.log('result',result)
       return result.data.createNode.id;
     })
     .catch(err => console.log(err));

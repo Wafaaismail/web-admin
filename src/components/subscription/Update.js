@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { gun } from "./initGun";
 import gql from 'graphql-tag';
+import {map} from 'lodash'
 
 const stringifyArgs = (args) => {
   // delete args.nodelabel
@@ -9,14 +10,15 @@ const stringifyArgs = (args) => {
 
 //Handling update action
 const handleUpdate = (that, nodeName, nodeId, props, client) => {
+  console.log("nodeName: ", nodeName, " nodeId: ", nodeId, " props: ", props)
   const data = { ...props };
-
   //First check if the node actually exists to be updated
   gun
     .get(nodeName)
     .get(nodeId)
     .once(obj => {
       if (obj) {
+       
         //Update node props in gun
         gun
           .get(nodeName)
@@ -31,13 +33,14 @@ const handleUpdate = (that, nodeName, nodeId, props, client) => {
         //Update node props in graph
         // resolvers.Mutation.updateNode({}, { nodeId, nodeArgs: data });
         let QUERY = gql`mutation {
-          updateNode(nodeId: "${nodeId}", nodeArgs: ${stringifyArgs(...data)})
+          updateNode(nodeId: "${nodeId}", nodeArgs: ${stringifyArgs({...data})})
         }`
+        console.log(QUERY)
         client.mutate({
           mutation: QUERY
         })
           .then(result => {
-            console.log(result)
+            console.log('ss',result)
           })
           .catch(err => {
             console.log(err)

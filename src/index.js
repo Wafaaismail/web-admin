@@ -5,6 +5,7 @@ import allReducers from './reducers'
 import { createStore, compose } from 'redux'
 import { Provider } from 'react-redux'
 import Login from './components/forms/login'
+import {reduxBatch} from '@manaflair/redux-batch'
 
 // initialize store, activate Redux devtools
 export const store = createStore(

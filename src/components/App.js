@@ -1,22 +1,12 @@
 import React, { Component } from "react";
-// import RenderForm from './forms/login/renderForm' 
 import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { connect } from "react-redux";
 import Subscription from "./subscription/index";
 import Search from "./Search";
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Popup from './popup-stations'
-import SearchStations from "./searchStations";
-import JourneyApp from './journeyApp'
-import Popup from './popup-add'
-import PopupEdit from './popup-edit'
-// import SearchStations from "./searchStations";
-// import Popup from './popup-stations'
-import SearchResult from "./SearchResult";
-import JourneyApp from './createJourney/journeyApp'
-import ResultExpansion from "./ResultExpansion"
+
+
 
 const client = new ApolloClient({
   uri: "http://localhost:3030/graphql"
@@ -38,27 +28,24 @@ class App extends Component {
   };
 
   //Store data for the node to be added
-  handleChangingState = (nodeName, node = {}, action, nodeId = "") => {
-    this.setState({ node, nodeName, [action]: 1, nodeId });
+  handleChangingState = (nodeName, node, action, nodeId, props) => {
+    // console.log('action',action)
+    this.setState({ node, nodeName, [action]: 1, nodeId, props });
+    // console.log("state",this.state)
   };
 
   render() {
     return (
       <ApolloProvider client={client}>
-        {/* <Router> */}
         <div>
-          <h1>Welcome to My React App!!</h1>
-          <JourneyApp />
-        </div>
+          <Search searchType ='journey' handleChangingState={this.handleChangingState}/>
 
           <Subscription
             that={this}
             state={this.state}
-            nodeName="station"
-            handleStateChange={this.handleStateChange}
+            handleStateReset={this.handleStateReset}
           /> 
-        {/* </div> */}
-        {/* </Router> */}
+        </div>
       </ApolloProvider>
     );
   }

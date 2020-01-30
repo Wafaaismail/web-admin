@@ -43,13 +43,14 @@ export default function Popup(props) {
       name: "station",
       props: {},
       relations: {
-        1: { type: "EXISTS_IN", with: "52873785-cfc9-4007-a04f-6e608c66b7ef" }
+        1: { type: "EXISTS_IN", with: "" }
       }
     }
   };
   const handleChangingState = stationName => {
     node.node.props = { name: stationName };
-    props.handleChangingState("station", node, props.action, props.id);
+    node.node.relations[1].with = props.id
+    props.handleChangingState("station", node, props.action, props.id, { name: stationName });
     console.log(node);
   };
   const classes = useStyles();
