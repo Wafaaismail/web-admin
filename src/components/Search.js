@@ -6,10 +6,10 @@ import { connect } from 'react-redux'
 import { withApollo } from 'react-apollo';
 // import {gun} from './subscription/initGun'
 import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
-import { map, flattenDeep, filter, get, reduce, assign } from 'lodash'
+import { map, filter, get, reduce, assign, flatten } from 'lodash'
 import { apply } from '../helpers/apply_function/apply'
 import SearchResult from './SearchResult';
-
+let data
 // query generators
 const querySearchOptions = (partialCityName) => {
   const QUERY = `
@@ -92,6 +92,14 @@ const queryStationsByTrip =(tripId)=>{
   return gql(QUERY)
 }
 
+const isBiggerDate = (date1, date2) => {
+  // returns true whether Date1 is bigger than Date2
+  // format 'YYYY/MM/DD HH:MM'
+  date1 = date1.slice(0,9)
+  date2 = date2.slice(0,9)
+  return date1 > date2
+
+}
 
 class Search extends Component {
   constructor(props) {
@@ -167,11 +175,54 @@ class Search extends Component {
     return finalOptions
   }
   
+  orderTripsAndStations = (trips) => {
+    // get trip objects in a list
+    const unorderedTrips = Object.values(trips)
+    // order them according to start date
+    const orderedTrips = unorderedTrips.sort((a,b) => {
+      return new Date(a.start_d) - new Date(b.start_d)
+    })
+    // console.log('orderd Trips', orderedTrips)
+
+    // get ordered stations via relations (from, to)
+    const orderedStations = flatten(
+      map(orderedTrips, (trip, index) => {
+        // get relations between each trip and its stations
+        const filteredRelations = apply({
+          funcName: 'filterByExactProps',
+          pathInState: 'relations_data',
+          params: { exactProps: { tripId: trip.id}},
+          then :{
+            funcName: 'filterByKeyExists',
+            params: { key: "stationId"},
+          }
+        })
+        // console.log('filteredRelations', filteredRelations)
+
+        // get departure station for each trip
+        const fromRelation = filter(filteredRelations, { type: 'FROM'})[0]
+        // console.log('fromRelation', fromRelation)
+        const departureStation = get(this.props.reduxState.station_data, fromRelation.stationId ,'no station')
+        // console.log('fromStation', fromStation)
+        
+        // get arrival station for last trip
+        if (orderedTrips.length-1 == index){
+          const toRelation = filter(filteredRelations, { type: 'TO'})[0]
+          const arrivalStation = get(this.props.reduxState.station_data, toRelation.stationId ,'no station')
+          return [departureStation, arrivalStation]
+        }
+        else return departureStation
+      })
+    )
+    return {trips: orderedTrips, stations: orderedStations}
+
+  }
+ 
   dataForJourneysChoices = async (stationId) => {
     /*** FROM STATION TO JOURNEYS (UP) ***/
     // get related trips: query, dispatch in redux, return
     const tripsRelatedToStatoin = (await this.executeQuery(queryTripsByStation, stationId)).trip_data
-    // console.log('tripsRelatedToStatoin', tripsRelatedToStatoin)
+    console.log('tripsRelatedToStatoin', tripsRelatedToStatoin)
     // get related journeys: query, dispatch in redux, return
     const journeysRelatedToStatoin = await reduce(tripsRelatedToStatoin, async (result, tripObj, tripId) => {
       const journeysRelatedToTrip = (await this.executeQuery(queryJourenysByTrip, tripId)).journey_data
@@ -182,7 +233,7 @@ class Search extends Component {
     // console.log('LENGTH', Object.keys(journeysRelatedToStatoin).length)
 
     /*** FROM JOURNEYS TO STATIONS (DOWN) ***/
-    const completeJournieseData = await Promise.all(
+    let completeJourneysData = await Promise.all(
       map(journeysRelatedToStatoin, async (journeyObj, journeyId) => {
         // get related trips: query, dispatch in redux, return
         const tripsRelatedToJourney = (await this.executeQuery(queryTripsByJourney, journeyId)).trip_data
@@ -195,12 +246,14 @@ class Search extends Component {
           // console.log('result', result)
           return assign(result, stationsRelatedToTrip)
         }, {})
+        const orderedTripsAndStations = this.orderTripsAndStations(tripsRelatedToJourney)
         // console.log('stationsRelatedToJourney', stationsRelatedToJourney)
-        return {journey: journeyObj, tripsRelatedToJourney, stationsRelatedToJourney}
+        return {id: journeyId, journey: journeyObj, ...orderedTripsAndStations}
       })
     )
-    console.log('completeJournieseData', completeJournieseData)
-    return completeJournieseData // dont return here, set it in local state and pass it to searchResult
+    console.log("completeJourneysData", completeJourneysData)
+    // const orderdStations= this.orderStations(tripsRelatedToJourney)     
+    this.setState({ completeJourneysData })
   }
 
   dataForStationsChoices = (cityId) => {
@@ -218,6 +271,7 @@ class Search extends Component {
     const cityStations = map(targetRelations, relation =>
       this.props.reduxState.station_data[relation.stationId]
     )
+    console.log('cityStations', cityStations)
     this.setState({ cityStations })
   }
 
@@ -271,7 +325,9 @@ class Search extends Component {
               variant="outlined" fullWidth />
           )}
         />
-        <SearchResult searchType={this.props.searchType} data={this.state.cityStations} handleChangingState={this.props.handleChangingState} />
+        <SearchResult searchType={this.props.searchType}
+         data={ this.props.searchType === 'journey' ?  this.state.completeJourneysData : this.state.cityStations}
+          handleChangingState={this.props.handleChangingState} />
       </>
     )
   }
