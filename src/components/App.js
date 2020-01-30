@@ -7,11 +7,9 @@ import Search from "./Search";
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-<<<<<<< Updated upstream
 import Popup from './popup-stations'
 import SearchStations from "./searchStations";
 import JourneyApp from './journeyApp'
-=======
 import Popup from './popup-add'
 import PopupEdit from './popup-edit'
 // import SearchStations from "./searchStations";
@@ -19,7 +17,6 @@ import PopupEdit from './popup-edit'
 import SearchResult from "./SearchResult";
 import JourneyApp from './createJourney/journeyApp'
 import ResultExpansion from "./ResultExpansion"
->>>>>>> Stashed changes
 
 const client = new ApolloClient({
   uri: "http://localhost:3030/graphql"
@@ -36,8 +33,13 @@ class App extends Component {
   };
 
   //Returns the state to initial after calling any action
-  handleStateChange = prop => {
+  handleStateReset = prop => {
     this.setState({ [prop]: 0, nodeId: "", props: {}, node: {} });
+  };
+
+  //Store data for the node to be added
+  handleChangingState = (nodeName, node = {}, action, nodeId = "") => {
+    this.setState({ node, nodeName, [action]: 1, nodeId });
   };
 
   render() {
