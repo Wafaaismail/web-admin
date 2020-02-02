@@ -1,13 +1,20 @@
-import { combineReducers } from 'redux'
-import { omit, get, reduce, map } from 'lodash'
-import { gun } from '../components/subscription/initGun'
+import { combineReducers } from "redux";
+import { omit, get, reduce, map } from "lodash";
+import { gun } from "../components/subscription/initGun";
 import { operations } from "./operations";
-
 
 // reducers names
 const reducerNames = [
-  'station', 'journey', 'trip',
-  'city_data', 'station_data', 'country_data', 'relations_data','trip_data','journey_data']
+  "station",
+  "journey",
+  "trip",
+  "city_data",
+  "station_data",
+  "country_data",
+  "relations_data",
+  "trip_data",
+  "journey_data"
+];
 
 // operation names
 const operationNames = ["add", "update", "erase"];
@@ -38,7 +45,6 @@ const buildReducers = () => {
         },
         {}
       );
-      console.log(handlers);
       result[reducerName] = (state = getData(reducerName), action) => {
         return get(handlers, action.type, d => d)(state, action);
       };
@@ -50,6 +56,6 @@ const buildReducers = () => {
 };
 
 // build, combine and export reducers
-const createdReducers = buildReducers()
-const combinedReducers = combineReducers(createdReducers)
-export default combinedReducers
+const createdReducers = buildReducers();
+const combinedReducers = combineReducers(createdReducers);
+export default combinedReducers;

@@ -3,7 +3,7 @@ import JourneyMutation from "./journeyMutation";
 import { set, map } from "lodash";
 import Button from "@material-ui/core/Button";
 import uuid from "../../helpers/uuid";
-import {Icon} from 'antd'
+import { Icon } from "antd";
 
 let journeyGraph = {
   node: {
@@ -46,27 +46,28 @@ class JourneyApp extends Component {
       let trips = [...this.state.trips];
 
       let filteredTrips = this.state.trips.filter(trip => trip.id !== tripId);
-      // console.log('filteredTrips', filteredTrips)
 
       this.setState({ trips: filteredTrips });
     }
   };
   journeyGraphHandler = (fieldName, value, tripID) => {
-    // console.log(tripID)
-
     set(
       journeyGraph,
       `node.relations.${tripID}.node.props.${fieldName}`,
       value
     );
-    // console.log(journeyGraph)
+  };
+
+  onClick = () => {
+    this.props.handleRender();
   };
 
   render() {
-    console.log('journey is here')
     return (
       <>
-        {/* <Button onClick={this.props.handleRender()}><Icon type="close"></Icon></Button> */}
+        <Button onClick={this.onClick}>
+          <Icon type="left"></Icon>
+        </Button>
         <h1
           style={{
             textAlign: "center",
@@ -88,7 +89,6 @@ class JourneyApp extends Component {
             Create New Trip
           </Button>
           {map(this.state.trips, (trip, key) => {
-            // console.log(trip)
             return (
               <JourneyMutation
                 key={key}
@@ -103,7 +103,13 @@ class JourneyApp extends Component {
           variant="contained"
           color="primary"
           onClick={() =>
-            this.props.handleChangingState("journey", journeyGraph, "add",'',{})
+            this.props.handleChangingState(
+              "journey",
+              journeyGraph,
+              "add",
+              "",
+              {}
+            )
           }
         >
           Save Journey

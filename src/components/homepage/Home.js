@@ -2,19 +2,19 @@ import React from "react";
 import "antd/dist/antd.css";
 import "./index.css";
 import { Layout, Menu, Icon } from "antd";
-import {
-  BrowserRouter as Router,
-  Route, Link
-} from 'react-router-dom'
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Search from "../Search";
-
+import JourneyApp from "../createJourney/journeyApp";
 
 const { Header, Sider, Content } = Layout;
 
 class Home extends React.Component {
   state = {
-    collapsed: false
-    // visible: false
+    collapsed: false,
+    controlDisplay: true
+  };
+  handleRender = () => {
+    this.setState({ controlDisplay: !this.state.controlDisplay });
   };
 
   toggle = () => {
@@ -24,6 +24,23 @@ class Home extends React.Component {
   };
 
   render() {
+    let conditionalRender;
+    if (this.state.controlDisplay)
+      conditionalRender = (
+        <Search
+          searchType="journey"
+          handleRender={this.handleRender}
+          handleChangingState={this.props.handleChangingState}
+        />
+      );
+    else
+      conditionalRender = (
+        <JourneyApp
+          handleRender={this.handleRender}
+          handleChangingState={this.props.handleChangingState}
+        />
+      );
+
     return (
       <Router>
         <Layout>
@@ -32,22 +49,18 @@ class Home extends React.Component {
             <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
               <Menu.Item key="4">
                 <Icon type="home" />
-                <span>
-                  Home
-                </span>
-                <Link to='/home' style={{ color: "white" }} />
+                <span>Home</span>
+                <Link to="/home" style={{ color: "white" }} />
               </Menu.Item>
               <Menu.Item key="2">
                 <Icon type="global" />
-                <span>
-                  Journeys
-                </span >
-                <Link to='/journeys' style={{ color: "white" }} />
+                <span>Journeys</span>
+                <Link to="/journeys" style={{ color: "white" }} />
               </Menu.Item>
               <Menu.Item key="1">
                 <Icon type="car" />
-                <span>Stations</span >
-                <Link to='/stations' style={{ color: "white" }} />
+                <span>Stations</span>
+                <Link to="/stations" style={{ color: "white" }} />
               </Menu.Item>
               {/* <Menu.Item key="3">
                 <Icon type="user" />
@@ -71,16 +84,21 @@ class Home extends React.Component {
                 minHeight: 545
               }}
             >
-
-              <Route path='/home' render={() => (<div></div>)} />
-              <Route path='/journeys' render={() => (<Search searchType='journey' handleChangingState={this.props.handleChangingState} />)} />
-              <Route path='/stations' render={() => (<Search searchType='station' handleChangingState={this.props.handleChangingState}/>)} />
+              <Route path="/home" render={() => <div></div>} />
+              <Route path="/journeys" render={() => conditionalRender} />
+              <Route
+                path="/stations"
+                render={() => (
+                  <Search
+                    searchType="station"
+                    handleChangingState={this.props.handleChangingState}
+                  />
+                )}
+              />
 
               {/* <Route path='/users'>
                 <Home/>
           </Route> */}
-
-
             </Content>
           </Layout>
         </Layout>

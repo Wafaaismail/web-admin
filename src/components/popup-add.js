@@ -1,11 +1,10 @@
-import React, { Component } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import * as FieldJSON from "../fieldsM";
-import * as Comp from "../fieldsComp";
-import { get, map, omit } from "lodash";
-import { Formik, Field, Form } from "formik";
-import { TextField, Button } from "@material-ui/core";
+import { map, omit } from "lodash";
+import { Formik, Form } from "formik";
+import { Button } from "@material-ui/core";
 import MiddleComponent from "./MiddleComponent";
 
 function rand() {
@@ -35,9 +34,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function Popup(props) {
-  // const handlePopUp = props.handlePopUp
-
-  console.log(props);
   let node = {
     node: {
       name: "station",
@@ -49,14 +45,14 @@ export default function Popup(props) {
   };
   const handleChangingState = stationName => {
     node.node.props = { name: stationName };
-    node.node.relations[1].with = props.id
-    props.handleChangingState("station", node, props.action, props.id, { name: stationName });
-    console.log(node);
+    node.node.relations[1].with = props.id;
+    props.handleChangingState("station", node, props.action, props.id, {
+      name: stationName
+    });
   };
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [modalStyle] = React.useState(getModalStyle);
-  // const [open, setOpen] = React.useState(false);
   const open = props.handlePopUp;
   const handleClose = () => {
     props.toggle();
@@ -64,11 +60,6 @@ export default function Popup(props) {
 
   return (
     <div>
-      {/* <button type="button" onClick={handleOpen}> */}
-      {/* <Button variant="contained" color="secondary" onClick={handleOpen}> Add New</Button> */}
-
-      {/* </button> */}
-
       <Modal
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
@@ -80,12 +71,10 @@ export default function Popup(props) {
           <Formik
             initialValues={{ addStation: "test" }}
             onSubmit={values => {
-              console.log("values", values);
               handleChangingState(values.addStation);
             }}
           >
             {FormikProps => {
-              // console.log('FormikProps', FormikProps)
               return (
                 <>
                   <Form>
@@ -106,36 +95,8 @@ export default function Popup(props) {
                   </Form>
                 </>
               );
-
-              {
-                /* <Form>
-                    <Field type="Text" id="addStation" name="addStation" placeholder="station name"  />
-                    {/* <TextField id="filled-basic" label="Filled" variant="filled" /> */
-              }
-
-              {
-                /* <button key="submit" htmlType="submit" type="primary" onClick={(values)=>{
-                      console.log(values)
-                      handleChangingState(values)}}>
-                Add
-            </button> */
-              }
-              {
-                /* </Form>  */
-              }
             }}
           </Formik>
-          {/* <Formik
-      initialValues={{ addStation: '' }}
-      onSubmit={(values, actions) => {
-        setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          actions.setSubmitting(false);
-        }, 1000);
-      }}
-      render={(props: FormikProps<Values>) => ( */}
-          {/*      
-            <SimpleModal /> */}
         </div>
       </Modal>
     </div>

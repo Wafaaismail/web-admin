@@ -384,7 +384,7 @@ class Search extends Component {
           }
           handleChangingState={this.props.handleChangingState}
           id={this.state.searchId}
-          handleRender={this.handleRender}
+          handleRender={this.props.handleRender}
         />
       </>
     );

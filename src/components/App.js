@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
 import { connect } from "react-redux";
 import Subscription from "./subscription/index";
-import Search from "./Search";
-import Home from './homepage/Home'
+import Home from "./homepage/Home";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
 
@@ -28,25 +27,22 @@ class App extends Component {
 
   //Store data for the node to be added
   handleChangingState = (nodeName, node, action, nodeId, props) => {
-    console.log('action',action)
-    console.log("state",this.state)
     this.setState({ node, nodeName, [action]: 1, nodeId, props });
-    // console.log("state",this.state)
   };
 
   render() {
     return (
       <ApolloProvider client={client}>
         <div>
-          <Home handleChangingState={this.handleChangingState}/>
+          <Home handleChangingState={this.handleChangingState} />
           {/* <Search searchType='station' /> */}
 
-           {/* <Search
+          {/* <Search
             searchType="station"
             handleChangingState={this.handleChangingState}
           /> */}
 
-         <Subscription
+          <Subscription
             that={this}
             state={this.state}
             handleStateReset={this.handleStateReset}
