@@ -1,17 +1,16 @@
-import React, { Component } from 'react'
-import gql from 'graphql-tag';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { connect } from 'react-redux'
-import { withApollo } from 'react-apollo';
-// import {gun} from './subscription/initGun'
+import React, { Component } from "react";
+import gql from "graphql-tag";
+import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import { connect } from "react-redux";
+import { withApollo } from "react-apollo";
 import { normalizedMapDispatchToProps } from "../helpers/dispatchers";
-import { map, filter, get, reduce, assign, flatten } from 'lodash'
-import { apply } from '../helpers/apply_function/apply'
-import SearchResult from './SearchResult';
-import Journey from './createJourney/journeyApp'
+import { map, filter, get, reduce, assign, flatten } from "lodash";
+import { apply } from "../helpers/apply_function/apply";
+import SearchResult from "./SearchResult";
+
 // query generators
-const querySearchOptions = (partialCityName) => {
+const querySearchOptions = partialCityName => {
   const QUERY = `
   {
     normalizedSearch(
@@ -24,11 +23,11 @@ const querySearchOptions = (partialCityName) => {
       }  
     )
   }
-  `
-  return gql(QUERY)
-}
+  `;
+  return gql(QUERY);
+};
 
-const queryTripsByStation = (stationId) => {
+const queryTripsByStation = stationId => {
   const QUERY = `
     {
       normalizedSearch(
@@ -40,11 +39,11 @@ const queryTripsByStation = (stationId) => {
         }  
       )
     }
-  `
-  return gql(QUERY)
-}
+  `;
+  return gql(QUERY);
+};
 
-const queryJourenysByTrip = (tripId) => {
+const queryJourenysByTrip = tripId => {
   const QUERY = `
     {
       normalizedSearch(
@@ -56,11 +55,11 @@ const queryJourenysByTrip = (tripId) => {
         }  
       )
     }
-  `
-  return gql(QUERY)
-}
+  `;
+  return gql(QUERY);
+};
 
-const queryTripsByJourney = (journeyId) => {
+const queryTripsByJourney = journeyId => {
   const QUERY = `
     {
       normalizedSearch(
@@ -72,11 +71,11 @@ const queryTripsByJourney = (journeyId) => {
         }  
       )
     }
-  `
-  return gql(QUERY)
-}
+  `;
+  return gql(QUERY);
+};
 
-const queryStationsByTrip = (tripId) => {
+const queryStationsByTrip = tripId => {
   const QUERY = `
     {
       normalizedSearch(
@@ -88,103 +87,112 @@ const queryStationsByTrip = (tripId) => {
         }  
       )
     }
-  `
-  return gql(QUERY)
-}
+  `;
+  return gql(QUERY);
+};
 
 const isBiggerDate = (date1, date2) => {
   // returns true whether Date1 is bigger than Date2
   // format 'YYYY/MM/DD HH:MM'
-  date1 = date1.slice(0, 9)
-  date2 = date2.slice(0, 9)
-  return date1 > date2
-
-}
+  date1 = date1.slice(0, 9);
+  date2 = date2.slice(0, 9);
+  return date1 > date2;
+};
 
 class Search extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      searchId: '',
-      controlDisplay: true
-    }
+      searchId: ""
+    };
   }
-  handleRender = () => { this.setState({ controlDisplay: !this.state.controlDisplay }) }
   executeQuery = async (querySignature, input) => {
-    const queryResults = await this.props.client.query({
-      query: querySignature(input)
-    })
-      .then(results => {
-        this.props.multiDispatchQueryResults(results.data.normalizedSearch)
-        return results.data.normalizedSearch
+    const queryResults = await this.props.client
+      .query({
+        query: querySignature(input)
       })
-      .catch(error => console.error(error))
+      .then(results => {
+        this.props.multiDispatchQueryResults(results.data.normalizedSearch);
+        return results.data.normalizedSearch;
+      })
+      .catch(error => console.error(error));
     // console.log('queryResults', queryResults)
-    return queryResults
-  }
+    return queryResults;
+  };
 
-  filterReduxForOptions = (searchTerm) => {
-    const { reduxState, searchType } = this.props
+  filterReduxForOptions = searchTerm => {
+    const { reduxState, searchType } = this.props;
 
-    const finalOptions = []
+    const finalOptions = [];
 
     // get city objects that include search term
     const cityObjs = apply({
-      funcName: 'filterByPartialProp',
-      pathInState: 'city_data',
+      funcName: "filterByPartialProp",
+      pathInState: "city_data",
       params: { partialProp: { name: searchTerm } }
-    })
+    });
 
     // do the following for each city object
     map(cityObjs, cityObj => {
       // get country relation
       const countryRelation = apply({
-        funcName: 'filterByKeyExists',
-        pathInState: 'relations_data',
-        params: { key: 'countryId' },
+        funcName: "filterByKeyExists",
+        pathInState: "relations_data",
+        params: { key: "countryId" },
         then: {
-          funcName: 'filterByExactProps',
+          funcName: "filterByExactProps",
           params: { exactProps: { cityId: cityObj.id } }
         }
-      })[0]
+      })[0];
       // get country obj
-      const countryObj = reduxState.country_data[countryRelation.countryId]
+      const countryObj = reduxState.country_data[countryRelation.countryId];
       // option up to now
-      const option = { cityId: cityObj.id, countryName: countryObj.name, cityName: cityObj.name }
+      const option = {
+        cityId: cityObj.id,
+        countryName: countryObj.name,
+        cityName: cityObj.name
+      };
       // go for stations if its a 'journey' search or push the option above
-      if (searchType !== 'station') {
+      if (searchType !== "station") {
         // get station relations
         const stationRelations = apply({
-          funcName: 'filterByKeyExists',
-          pathInState: 'relations_data',
-          params: { key: 'stationId' },
+          funcName: "filterByKeyExists",
+          pathInState: "relations_data",
+          params: { key: "stationId" },
           then: {
-            funcName: 'filterByExactProps',
+            funcName: "filterByExactProps",
             params: { exactProps: { cityId: cityObj.id } }
           }
-        })
+        });
         // get station objs
-        const stationObjs = map(stationRelations, relation =>
-          reduxState.station_data[relation.stationId]
-        )
+        const stationObjs = map(
+          stationRelations,
+          relation => reduxState.station_data[relation.stationId]
+        );
         // create and add options
         map(stationObjs, stationObj => {
-          finalOptions.push({ ...option, stationName: stationObj.name, stationId: stationObj.id })
-        })
-      } else { finalOptions.push(option) }
-    })
+          finalOptions.push({
+            ...option,
+            stationName: stationObj.name,
+            stationId: stationObj.id
+          });
+        });
+      } else {
+        finalOptions.push(option);
+      }
+    });
 
     // console.log('options: ', finalOptions)
-    return finalOptions
-  }
+    return finalOptions;
+  };
 
-  orderTripsAndStations = (trips) => {
+  orderTripsAndStations = trips => {
     // get trip objects in a list
-    const unorderedTrips = Object.values(trips)
+    const unorderedTrips = Object.values(trips);
     // order them according to start date
     const orderedTrips = unorderedTrips.sort((a, b) => {
-      return new Date(a.start_d) - new Date(b.start_d)
-    })
+      return new Date(a.start_d) - new Date(b.start_d);
+    });
     // console.log('orderd Trips', orderedTrips)
 
     // get ordered stations via relations (from, to)
@@ -192,46 +200,60 @@ class Search extends Component {
       map(orderedTrips, (trip, index) => {
         // get relations between each trip and its stations
         const filteredRelations = apply({
-          funcName: 'filterByExactProps',
-          pathInState: 'relations_data',
+          funcName: "filterByExactProps",
+          pathInState: "relations_data",
           params: { exactProps: { tripId: trip.id } },
           then: {
-            funcName: 'filterByKeyExists',
-            params: { key: "stationId" },
+            funcName: "filterByKeyExists",
+            params: { key: "stationId" }
           }
-        })
+        });
         // console.log('filteredRelations', filteredRelations)
 
         // get departure station for each trip
-        const fromRelation = filter(filteredRelations, { type: 'FROM' })[0]
+        const fromRelation = filter(filteredRelations, { type: "FROM" })[0];
         // console.log('fromRelation', fromRelation)
-        const departureStation = get(this.props.reduxState.station_data, fromRelation.stationId, 'no station')
+        const departureStation = get(
+          this.props.reduxState.station_data,
+          fromRelation.stationId,
+          "no station"
+        );
         // console.log('fromStation', fromStation)
 
         // get arrival station for last trip
         if (orderedTrips.length - 1 == index) {
-          const toRelation = filter(filteredRelations, { type: 'TO' })[0]
-          const arrivalStation = get(this.props.reduxState.station_data, toRelation.stationId, 'no station')
-          return [departureStation, arrivalStation]
-        }
-        else return departureStation
+          const toRelation = filter(filteredRelations, { type: "TO" })[0];
+          const arrivalStation = get(
+            this.props.reduxState.station_data,
+            toRelation.stationId,
+            "no station"
+          );
+          return [departureStation, arrivalStation];
+        } else return departureStation;
       })
-    )
-    return { trips: orderedTrips, stations: orderedStations }
+    );
+    return { trips: orderedTrips, stations: orderedStations };
+  };
 
-  }
-
-  dataForJourneysChoices = async (stationId) => {
+  dataForJourneysChoices = async stationId => {
     /*** FROM STATION TO JOURNEYS (UP) ***/
     // get related trips: query, dispatch in redux, return
-    const tripsRelatedToStatoin = (await this.executeQuery(queryTripsByStation, stationId)).trip_data
-    console.log('tripsRelatedToStatoin', tripsRelatedToStatoin)
+    const tripsRelatedToStatoin = (
+      await this.executeQuery(queryTripsByStation, stationId)
+    ).trip_data;
+    console.log("tripsRelatedToStatoin", tripsRelatedToStatoin);
     // get related journeys: query, dispatch in redux, return
-    const journeysRelatedToStatoin = await reduce(tripsRelatedToStatoin, async (result, tripObj, tripId) => {
-      const journeysRelatedToTrip = (await this.executeQuery(queryJourenysByTrip, tripId)).journey_data
-      result = await result // wait for result promise to resolve to an object
-      return assign(result, journeysRelatedToTrip)
-    }, {})
+    const journeysRelatedToStatoin = await reduce(
+      tripsRelatedToStatoin,
+      async (result, tripObj, tripId) => {
+        const journeysRelatedToTrip = (
+          await this.executeQuery(queryJourenysByTrip, tripId)
+        ).journey_data;
+        result = await result; // wait for result promise to resolve to an object
+        return assign(result, journeysRelatedToTrip);
+      },
+      {}
+    );
     // console.log('journeysRelatedToStatoin', journeysRelatedToStatoin)
     // console.log('LENGTH', Object.keys(journeysRelatedToStatoin).length)
 
@@ -239,106 +261,133 @@ class Search extends Component {
     let completeJourneysData = await Promise.all(
       map(journeysRelatedToStatoin, async (journeyObj, journeyId) => {
         // get related trips: query, dispatch in redux, return
-        const tripsRelatedToJourney = (await this.executeQuery(queryTripsByJourney, journeyId)).trip_data
+        const tripsRelatedToJourney = (
+          await this.executeQuery(queryTripsByJourney, journeyId)
+        ).trip_data;
         // console.log('tripsRelatedToJourney', tripsRelatedToJourney)
         // get related stations: query, dispatch in redux, return
-        const stationsRelatedToJourney = await reduce(tripsRelatedToJourney, async (result, tripObj, tripId) => {
-          const stationsRelatedToTrip = (await this.executeQuery(queryStationsByTrip, tripId)).station_data
-          result = await result // wait for result promise to resolve to an object
-          // console.log('stationsRelatedToTrip', stationsRelatedToTrip)
-          // console.log('result', result)
-          return assign(result, stationsRelatedToTrip)
-        }, {})
-        const orderedTripsAndStations = this.orderTripsAndStations(tripsRelatedToJourney)
+        const stationsRelatedToJourney = await reduce(
+          tripsRelatedToJourney,
+          async (result, tripObj, tripId) => {
+            const stationsRelatedToTrip = (
+              await this.executeQuery(queryStationsByTrip, tripId)
+            ).station_data;
+            result = await result; // wait for result promise to resolve to an object
+            // console.log('stationsRelatedToTrip', stationsRelatedToTrip)
+            // console.log('result', result)
+            return assign(result, stationsRelatedToTrip);
+          },
+          {}
+        );
+        const orderedTripsAndStations = this.orderTripsAndStations(
+          tripsRelatedToJourney
+        );
         // console.log('stationsRelatedToJourney', stationsRelatedToJourney)
-        return { id: journeyId, journey: journeyObj, ...orderedTripsAndStations }
+        return {
+          id: journeyId,
+          journey: journeyObj,
+          ...orderedTripsAndStations
+        };
       })
-    )
-    console.log("completeJourneysData", completeJourneysData)
-    // const orderdStations= this.orderStations(tripsRelatedToJourney)     
-    this.setState({ completeJourneysData })
-  }
+    );
+    console.log("completeJourneysData", completeJourneysData);
+    // const orderdStations= this.orderStations(tripsRelatedToJourney)
+    this.setState({ completeJourneysData });
+  };
 
-  dataForStationsChoices = (cityId) => {
-    // get relations between our city and its stations 
+  dataForStationsChoices = cityId => {
+    // get relations between our city and its stations
     const targetRelations = apply({
-      funcName: 'filterByExactProps',
-      pathInState: 'relations_data',
+      funcName: "filterByExactProps",
+      pathInState: "relations_data",
       params: { exactProps: { cityId } },
       then: {
-        funcName: 'filterByKeyExists',
-        params: { key: 'stationId' }
+        funcName: "filterByKeyExists",
+        params: { key: "stationId" }
       }
-    })
+    });
     // get stations of the city
-    const cityStations = map(targetRelations, relation =>
-      this.props.reduxState.station_data[relation.stationId]
-    )
-    console.log('cityStations', cityStations)
-    this.setState({ cityStations })
-  }
+    const cityStations = map(
+      targetRelations,
+      relation => this.props.reduxState.station_data[relation.stationId]
+    );
+    console.log("cityStations", cityStations);
+    this.setState({ cityStations });
+  };
 
   handleOptionSelected = (event, option) => {
-    option ?
-      (this.props.searchType === 'journey' ?
-        (this.dataForJourneysChoices(option.stationId)) :
-        (this.dataForStationsChoices(option.cityId), this.state.searchId = option.cityId)
-      ) : console.log('No option is selected')
-  }
+    option
+      ? this.props.searchType === "journey"
+        ? this.dataForJourneysChoices(option.stationId)
+        : (this.dataForStationsChoices(option.cityId),
+          (this.state.searchId = option.cityId))
+      : console.log("No option is selected");
+  };
 
-  myTimer = ''
-  handleUserInput = (event) => {
+  myTimer = "";
+  handleUserInput = event => {
     // reuse the event for different values
-    event.persist()
+    event.persist();
     // cancel previous timer if any
-    clearTimeout(this.myTimer)
+    clearTimeout(this.myTimer);
     // get search term and do the following if any
-    const searchTerm = event.target.value
+    const searchTerm = event.target.value;
     if (searchTerm) {
       // set new timer
       this.myTimer = setTimeout(() => {
         // apply filter on redux
-        const optionsFromRedux = this.filterReduxForOptions(searchTerm)
+        const optionsFromRedux = this.filterReduxForOptions(searchTerm);
         if (optionsFromRedux.length !== 0) {
-          this.setState({ optionsFromRedux })
+          this.setState({ optionsFromRedux });
         } else {
           // execute query if there is a search term (the function automatically updates redux)
-          this.executeQuery(querySearchOptions, searchTerm)
+          this.executeQuery(querySearchOptions, searchTerm);
         }
-      }, 500)
-    } else { console.log("No term is entered") }
-  }
+      }, 500);
+    } else {
+      console.log("No term is entered");
+    }
+  };
 
   render() {
     return (
       <>
         <h1>{this.props.searchType.toUpperCase()}</h1>
-        {!this.state.controlDisplay && <Journey handleRender={this.handleRender} handleChangingState={this.props.handleChangingState}/>}
-        {this.state.controlDisplay &&
-          <Autocomplete
-            options={this.state.optionsFromRedux}
-            getOptionLabel={option =>
-              option.stationName ?
-                `${option.countryName}, ${option.cityName}, ${option.stationName}` :
-                `${option.countryName}, ${option.cityName}`
-            }
-            onChange={this.handleOptionSelected}
-            renderInput={params => (
-              <TextField {...params}
-                label={this.props.searchType == 'station' ?
-                  'Search city and select one' : 'Search city and select station'}
-                onChange={this.handleUserInput}
-                variant="outlined" fullWidth />
-            )}
-            /> }
-          {this.state.controlDisplay && <SearchResult searchType={this.props.searchType}
-            data={this.props.searchType === 'journey' ? this.state.completeJourneysData : this.state.cityStations}
-            handleChangingState={this.props.handleChangingState}
-            id={this.state.searchId}
-            handleRender={this.handleRender}
-          />}
+        <Autocomplete
+          options={this.state.optionsFromRedux}
+          getOptionLabel={option =>
+            option.stationName
+              ? `${option.countryName}, ${option.cityName}, ${option.stationName}`
+              : `${option.countryName}, ${option.cityName}`
+          }
+          onChange={this.handleOptionSelected}
+          renderInput={params => (
+            <TextField
+              {...params}
+              label={
+                this.props.searchType == "station"
+                  ? "Search city and select one"
+                  : "Search city and select station"
+              }
+              onChange={this.handleUserInput}
+              variant="outlined"
+              fullWidth
+            />
+          )}
+        />
+        <SearchResult
+          searchType={this.props.searchType}
+          data={
+            this.props.searchType === "journey"
+              ? this.state.completeJourneysData
+              : this.state.cityStations
+          }
+          handleChangingState={this.props.handleChangingState}
+          id={this.state.searchId}
+          handleRender={this.handleRender}
+        />
       </>
-    )
+    );
   }
 }
 
@@ -349,4 +398,6 @@ const mapStateToProps = state => {
   };
 };
 
-export default withApollo(connect(mapStateToProps, normalizedMapDispatchToProps)(Search))
+export default withApollo(
+  connect(mapStateToProps, normalizedMapDispatchToProps)(Search)
+);
